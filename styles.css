@@ -85,4 +85,27 @@ h1 {
 .failure {
     background: #f8d7da;
     color: #721c24;
+}
+
+.visual-demo {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.demo-canvas {
+    border: 1px solid #ddd;
+    max-width: 100%;
+}
+
+.font-sample {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
 } 
