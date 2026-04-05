@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html" aria-current="page">Media</a>
@@ -20,18 +19,27 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Media Capabilities Test</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Media</p>
+            <h1>Media Capabilities</h1>
+            <p class="lede">Check support for common image formats, video codecs, and audio playback types without leaving the page.</p>
+        </header>
         <div class="test-container">
-            <h2>Image Format Support</h2>
-            <div id="imageTests"></div>
-            
-            <h2>Video Codec Support</h2>
-            <div id="videoTests"></div>
-            
-            <h2>Audio Support</h2>
-            <div id="audioTests"></div>
+            <section class="test-section" id="image-format-support">
+                <h2>Image Format Support</h2>
+                <div id="imageTests"></div>
+            </section>
+            <section class="test-section" id="video-codec-support">
+                <h2>Video Codec Support</h2>
+                <div id="videoTests"></div>
+            </section>
+            <section class="test-section" id="audio-support">
+                <h2>Audio Support</h2>
+                <div id="audioTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

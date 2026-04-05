@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,21 +19,31 @@
         <a href="performance.html" aria-current="page">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Browser Performance Tests</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Performance</p>
+            <h1>Browser Performance</h1>
+            <p class="lede">Measure lightweight JavaScript and DOM benchmarks, then compare them with network and memory information from the current browser.</p>
+        </header>
         <div class="test-container">
-            <h2>JavaScript Performance</h2>
-            <div id="jsPerformance"></div>
-            
-            <h2>DOM Operations</h2>
-            <div id="domPerformance"></div>
-            
-            <h2>Network Capabilities</h2>
-            <div id="networkPerformance"></div>
-
-            <h2>Memory Usage</h2>
-            <div id="memoryTests"></div>
+            <section class="test-section" id="javascript-performance">
+                <h2>JavaScript Performance</h2>
+                <div id="jsPerformance"></div>
+            </section>
+            <section class="test-section" id="dom-operations">
+                <h2>DOM Operations</h2>
+                <div id="domPerformance"></div>
+            </section>
+            <section class="test-section" id="network-capabilities">
+                <h2>Network Capabilities</h2>
+                <div id="networkPerformance"></div>
+            </section>
+            <section class="test-section" id="memory-usage">
+                <h2>Memory Usage</h2>
+                <div id="memoryTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

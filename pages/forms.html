@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,18 +19,27 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Forms & Input Test</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Forms</p>
+            <h1>Forms and Input</h1>
+            <p class="lede">Review how the current browser handles modern input types, form helpers, and built-in validation features.</p>
+        </header>
         <div class="test-container">
-            <h2>Input Types Support</h2>
-            <div id="inputTests"></div>
-            
-            <h2>Form Features</h2>
-            <div id="formFeatureTests"></div>
-            
-            <h2>Validation Features</h2>
-            <div id="validationTests"></div>
+            <section class="test-section" id="input-types-support">
+                <h2>Input Types Support</h2>
+                <div id="inputTests"></div>
+            </section>
+            <section class="test-section" id="form-features">
+                <h2>Form Features</h2>
+                <div id="formFeatureTests"></div>
+            </section>
+            <section class="test-section" id="validation-features">
+                <h2>Validation Features</h2>
+                <div id="validationTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,21 +19,31 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Web APIs Test</h1>
+        <header class="page-hero">
+            <p class="eyebrow">APIs</p>
+            <h1>Web APIs</h1>
+            <p class="lede">Scan storage, device, communication, and performance-related APIs from one place with section-level navigation.</p>
+        </header>
         <div class="test-container">
-            <h2>Storage APIs</h2>
-            <div id="storageTests"></div>
-            
-            <h2>Device APIs</h2>
-            <div id="deviceTests"></div>
-            
-            <h2>Communication APIs</h2>
-            <div id="communicationTests"></div>
-
-            <h2>Performance APIs</h2>
-            <div id="performanceTests"></div>
+            <section class="test-section" id="storage-apis">
+                <h2>Storage APIs</h2>
+                <div id="storageTests"></div>
+            </section>
+            <section class="test-section" id="device-apis">
+                <h2>Device APIs</h2>
+                <div id="deviceTests"></div>
+            </section>
+            <section class="test-section" id="communication-apis">
+                <h2>Communication APIs</h2>
+                <div id="communicationTests"></div>
+            </section>
+            <section class="test-section" id="performance-apis">
+                <h2>Performance APIs</h2>
+                <div id="performanceTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

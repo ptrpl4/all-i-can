@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,21 +19,31 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html" aria-current="page">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Accessibility-Related Browser APIs</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Accessibility</p>
+            <h1>Accessibility-Related Browser APIs</h1>
+            <p class="lede">Review the browser features that support semantic markup, keyboard interaction, and user preference media queries.</p>
+        </header>
         <div class="test-container">
-            <h2>ARIA and DOM Semantics</h2>
-            <div id="screenReaderTests"></div>
-            
-            <h2>Keyboard-Related APIs</h2>
-            <div id="keyboardTests"></div>
-            
-            <h2>User Preference Media Queries</h2>
-            <div id="contrastTests"></div>
-
-            <h2>ARIA Attribute Reflection</h2>
-            <div id="ariaTests"></div>
+            <section class="test-section" id="aria-and-dom-semantics">
+                <h2>ARIA and DOM Semantics</h2>
+                <div id="screenReaderTests"></div>
+            </section>
+            <section class="test-section" id="keyboard-related-apis">
+                <h2>Keyboard-Related APIs</h2>
+                <div id="keyboardTests"></div>
+            </section>
+            <section class="test-section" id="user-preference-media-queries">
+                <h2>User Preference Media Queries</h2>
+                <div id="contrastTests"></div>
+            </section>
+            <section class="test-section" id="aria-attribute-reflection">
+                <h2>ARIA Attribute Reflection</h2>
+                <div id="ariaTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

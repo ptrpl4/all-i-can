@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,21 +19,31 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html" aria-current="page">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>User Activity Test</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Activity</p>
+            <h1>User Activity</h1>
+            <p class="lede">Track interaction and browser-event streams in grouped live logs with clearer orientation and faster section jumps.</p>
+        </header>
         <div class="test-container">
-            <h2>Mouse Activity</h2>
-            <div id="mouseActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
-            
-            <h2>Keyboard Activity</h2>
-            <div id="keyboardActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
-            
-            <h2>Browser Events</h2>
-            <div id="browserActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
-
-            <h2>Page Interactions</h2>
-            <div id="interactionActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            <section class="test-section" id="mouse-activity">
+                <h2>Mouse Activity</h2>
+                <div id="mouseActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            </section>
+            <section class="test-section" id="keyboard-activity">
+                <h2>Keyboard Activity</h2>
+                <div id="keyboardActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            </section>
+            <section class="test-section" id="browser-events">
+                <h2>Browser Events</h2>
+                <div id="browserActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            </section>
+            <section class="test-section" id="page-interactions">
+                <h2>Page Interactions</h2>
+                <div id="interactionActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            </section>
         </div>
     </main>
     <script src="../js/activity.js"></script>

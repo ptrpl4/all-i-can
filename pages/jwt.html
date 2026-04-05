@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Tools - Browser Tester</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="media.html">Media</a>
+        <a href="forms.html">Forms</a>
+        <a href="security.html">Security</a>
+        <a href="api.html">APIs</a>
+        <a href="data.html">Data</a>
+        <a href="graphics.html">Graphics</a>
+        <a href="performance.html">Performance</a>
+        <a href="accessibility.html">Accessibility</a>
+        <a href="activity.html">Activity</a>
+        <a href="jwt.html" aria-current="page">JWT</a>
+    </nav>
+    <main id="main-content">
+        <header class="page-hero">
+            <p class="eyebrow">JWT</p>
+            <h1>JWT Encode, Decode, and Compare</h1>
+            <p class="lede">Create signed `HS256` tokens in the browser, inspect encoded JWTs, and compare two tokens by their decoded header, payload, and signature.</p>
+        </header>
+        <div class="test-container">
+            <section class="test-section">
+                <h2>Encode JWT</h2>
+                <div class="tool-grid">
+                    <label class="field">
+                        <span>Algorithm</span>
+                        <select id="jwtAlgorithm">
+                            <option value="HS256" selected>HS256</option>
+                            <option value="none">none</option>
+                        </select>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Header JSON</span>
+                        <textarea id="jwtHeaderInput" rows="8" spellcheck="false">{
+  "alg": "HS256",
+  "typ": "JWT"
+}</textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Payload JSON</span>
+                        <textarea id="jwtPayloadInput" rows="10" spellcheck="false">{
+  "sub": "1234567890",
+  "name": "Browser Tester",
+  "iat": 1712323200
+}</textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Secret</span>
+                        <input id="jwtSecretInput" type="text" placeholder="Shared secret for HS256">
+                    </label>
+                </div>
+                <div class="tool-actions">
+                    <button id="jwtEncodeButton" class="action-btn" type="button">Generate JWT</button>
+                    <button id="jwtEncodeClearButton" class="secondary-btn" type="button">Clear</button>
+                </div>
+                <div id="jwtEncodeStatus"></div>
+                <label class="field field-wide">
+                    <span>Encoded JWT</span>
+                    <textarea id="jwtEncodedOutput" rows="5" readonly spellcheck="false"></textarea>
+                </label>
+            </section>
+
+            <section class="test-section">
+                <h2>Decode JWT</h2>
+                <label class="field field-wide">
+                    <span>Encoded JWT</span>
+                    <textarea id="jwtDecodeInput" rows="5" spellcheck="false" placeholder="Paste a JWT to decode"></textarea>
+                </label>
+                <div class="tool-actions">
+                    <button id="jwtDecodeButton" class="action-btn" type="button">Decode JWT</button>
+                    <button id="jwtDecodeClearButton" class="secondary-btn" type="button">Clear</button>
+                </div>
+                <div id="jwtDecodeStatus"></div>
+                <div class="tool-grid">
+                    <label class="field field-wide">
+                        <span>Decoded Header</span>
+                        <textarea id="jwtDecodedHeader" rows="8" readonly spellcheck="false"></textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Decoded Payload</span>
+                        <textarea id="jwtDecodedPayload" rows="10" readonly spellcheck="false"></textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Signature</span>
+                        <textarea id="jwtDecodedSignature" rows="3" readonly spellcheck="false"></textarea>
+                    </label>
+                </div>
+            </section>
+
+            <section class="test-section">
+                <h2>Compare Two Encoded JWTs</h2>
+                <div class="tool-grid compare-grid">
+                    <label class="field field-wide">
+                        <span>JWT A</span>
+                        <div class="field-actions">
+                            <button id="jwtCompareAFromEncode" class="secondary-btn" type="button" disabled>Use Generated Snapshot</button>
+                            <button id="jwtCompareAFromDecode" class="secondary-btn" type="button" disabled>Use Decoded Snapshot</button>
+                        </div>
+                        <textarea id="jwtCompareA" rows="8" spellcheck="false" placeholder="Paste an encoded JWT or a decoded snapshot"></textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>JWT B</span>
+                        <div class="field-actions">
+                            <button id="jwtCompareBFromEncode" class="secondary-btn" type="button" disabled>Use Generated Snapshot</button>
+                            <button id="jwtCompareBFromDecode" class="secondary-btn" type="button" disabled>Use Decoded Snapshot</button>
+                        </div>
+                        <textarea id="jwtCompareB" rows="8" spellcheck="false" placeholder="Paste an encoded JWT or a decoded snapshot"></textarea>
+                    </label>
+                </div>
+                <div class="tool-actions">
+                    <button id="jwtCompareButton" class="action-btn" type="button">Compare JWTs</button>
+                    <button id="jwtFullscreenButton" class="secondary-btn" type="button" disabled>Open Fullscreen Compare</button>
+                    <button id="jwtCompareClearButton" class="secondary-btn" type="button">Clear</button>
+                </div>
+                <div id="jwtCompareStatus"></div>
+                <div id="jwtDiffSummary" class="diff-summary"></div>
+                <div id="jwtDiffOutput" class="diff-output"></div>
+            </section>
+        </div>
+    </main>
+    <dialog id="jwtCompareDialog" class="compare-dialog">
+        <div class="compare-dialog-shell">
+            <div class="compare-dialog-header">
+                <div>
+                    <p class="eyebrow">JWT</p>
+                    <h2>Fullscreen Compare</h2>
+                </div>
+                <button id="jwtCompareDialogClose" class="secondary-btn" type="button">Close</button>
+            </div>
+            <div id="jwtCompareDialogSummary" class="diff-summary"></div>
+            <div id="jwtCompareDialogOutput" class="diff-output diff-output-wide"></div>
+        </div>
+    </dialog>
+    <script src="../js/utils.js"></script>
+    <script src="../js/jwt.js"></script>
+</body>
+</html>

@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,18 +19,27 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>Security APIs and Page Context</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Security</p>
+            <h1>Security APIs and Page Context</h1>
+            <p class="lede">Separate browser-exposed security APIs from deployment-sensitive page context so capability checks are easier to interpret.</p>
+        </header>
         <div class="test-container">
-            <h2>Authentication APIs</h2>
-            <div id="webauthnTests"></div>
-            
-            <h2>Crypto APIs</h2>
-            <div id="cryptoTests"></div>
-            
-            <h2>Current Page Security Context</h2>
-            <div id="securityFeatureTests"></div>
+            <section class="test-section" id="authentication-apis">
+                <h2>Authentication APIs</h2>
+                <div id="webauthnTests"></div>
+            </section>
+            <section class="test-section" id="crypto-apis">
+                <h2>Crypto APIs</h2>
+                <div id="cryptoTests"></div>
+            </section>
+            <section class="test-section" id="current-page-security-context">
+                <h2>Current Page Security Context</h2>
+                <div id="securityFeatureTests"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>

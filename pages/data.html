@@ -8,7 +8,6 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
         <a href="../index.html">Home</a>
         <a href="media.html">Media</a>
@@ -20,27 +19,39 @@
         <a href="performance.html">Performance</a>
         <a href="accessibility.html">Accessibility</a>
         <a href="activity.html">Activity</a>
+        <a href="jwt.html">JWT</a>
     </nav>
     <main id="main-content">
-        <h1>User Data Test</h1>
+        <header class="page-hero">
+            <p class="eyebrow">Data</p>
+            <h1>User Data</h1>
+            <p class="lede">Inspect the browser, system, network, and user-preference information exposed by the current runtime environment.</p>
+        </header>
         <div class="test-container">
-            <h2>Browser Information</h2>
-            <div id="browserInfo"></div>
-            
-            <h2>System Information</h2>
-            <div id="systemInfo"></div>
-            
-            <h2>Network Information</h2>
-            <div id="networkInfo"></div>
-
-            <h2>Location & Sensors</h2>
-            <div id="locationInfo"></div>
-
-            <h2>Device Information</h2>
-            <div id="deviceInfo"></div>
-
-            <h2>User Preferences</h2>
-            <div id="preferencesInfo"></div>
+            <section class="test-section" id="browser-information">
+                <h2>Browser Information</h2>
+                <div id="browserInfo"></div>
+            </section>
+            <section class="test-section" id="system-information">
+                <h2>System Information</h2>
+                <div id="systemInfo"></div>
+            </section>
+            <section class="test-section" id="network-information">
+                <h2>Network Information</h2>
+                <div id="networkInfo"></div>
+            </section>
+            <section class="test-section" id="location-and-sensors">
+                <h2>Location & Sensors</h2>
+                <div id="locationInfo"></div>
+            </section>
+            <section class="test-section" id="device-information">
+                <h2>Device Information</h2>
+                <div id="deviceInfo"></div>
+            </section>
+            <section class="test-section" id="user-preferences">
+                <h2>User Preferences</h2>
+                <div id="preferencesInfo"></div>
+            </section>
         </div>
     </main>
     <script src="../js/utils.js"></script>
