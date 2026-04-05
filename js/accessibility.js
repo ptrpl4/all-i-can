@@ -120,6 +120,7 @@ function testARIAAttributes() {
 function showResult(container, feature, supported) {
     const div = document.createElement('div');
     div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported ? 'Supported' : 'Not Supported'}`;
+    div.textContent = `${feature}: ${supported === true || supported === false ?
+        (supported ? 'Supported' : 'Not Supported') : supported}`;
     container.appendChild(div);
-} 
+}
