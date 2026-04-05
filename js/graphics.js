@@ -114,10 +114,6 @@ function createWebGLDemo() {
 
     const gl = canvas.getContext('webgl');
     if (!gl) return;
-    if (!window.mat4) {
-        window.BrowserTester.showInfo(container, 'WebGL Demo', 'The matrix helper library did not load, so the 3D demo is unavailable.');
-        return;
-    }
 
     // Create a rotating cube
     const vsSource = `
@@ -381,12 +377,11 @@ function initShaderProgram(gl, vsSource, fsSource) {
 
         const fieldOfView = 45 * Math.PI / 180;
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-        const projectionMatrix = mat4.create();
-        mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
-
-        const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -6.0]);
-        mat4.rotate(modelViewMatrix, modelViewMatrix, rotation, [1, 1, 1]);
+        const projectionMatrix = createPerspectiveMatrix(fieldOfView, aspect, 0.1, 100.0);
+        const modelViewMatrix = multiplyMatrices(
+            createTranslationMatrix(0.0, 0.0, -6.0),
+            createRotationMatrix(rotation, [1, 1, 1])
+        );
 
         gl.useProgram(programInfo.program);
         gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
@@ -436,4 +431,64 @@ function loadShader(gl, type, source) {
     }
 
     return shader;
-} 
+}
+
+function createPerspectiveMatrix(fieldOfView, aspect, near, far) {
+    const f = 1.0 / Math.tan(fieldOfView / 2);
+    const rangeInv = 1 / (near - far);
+
+    return new Float32Array([
+        f / aspect, 0, 0, 0,
+        0, f, 0, 0,
+        0, 0, (near + far) * rangeInv, -1,
+        0, 0, near * far * rangeInv * 2, 0
+    ]);
+}
+
+function createTranslationMatrix(x, y, z) {
+    return new Float32Array([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        x, y, z, 1
+    ]);
+}
+
+function createRotationMatrix(angle, axis) {
+    const [x, y, z] = normalizeVector(axis);
+    const s = Math.sin(angle);
+    const c = Math.cos(angle);
+    const t = 1 - c;
+
+    return new Float32Array([
+        x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0,
+        x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0,
+        x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0,
+        0, 0, 0, 1
+    ]);
+}
+
+function multiplyMatrices(a, b) {
+    const result = new Float32Array(16);
+
+    for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+            let sum = 0;
+            for (let i = 0; i < 4; i++) {
+                sum += a[row + i * 4] * b[i + col * 4];
+            }
+            result[row + col * 4] = sum;
+        }
+    }
+
+    return result;
+}
+
+function normalizeVector([x, y, z]) {
+    const length = Math.hypot(x, y, z);
+    if (length === 0) {
+        return [0, 0, 1];
+    }
+
+    return [x / length, y / length, z / length];
+}

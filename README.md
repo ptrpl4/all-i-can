@@ -2,7 +2,7 @@
 
 A static browser test site for checking browser APIs, media support, graphics capabilities, page context, and user interaction events.
 
-Built with plain HTML, CSS, and JavaScript. The graphics page currently uses `gl-matrix` from a CDN for the WebGL demo.
+Built with plain HTML, CSS, and JavaScript.
 
 ## Features
 
@@ -21,7 +21,6 @@ Built with plain HTML, CSS, and JavaScript. The graphics page currently uses `gl
 - Plain JavaScript
 - HTML5
 - CSS3
-- `gl-matrix` via CDN on the graphics page
 - Hosted on GitHub Pages
 
 ## Browser Support
