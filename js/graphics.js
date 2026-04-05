@@ -156,29 +156,36 @@ function createCanvasDemo() {
 
     const ctx = canvas.getContext('2d');
     let frame = 0;
+    let rafId = null;
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw animated patterns
-        for(let i = 0; i < 12; i++) {
+
+        for (let i = 0; i < 12; i++) {
             ctx.beginPath();
             ctx.arc(
-                150 + Math.cos(frame/50 + i) * 50,
-                150 + Math.sin(frame/50 + i) * 50,
-                10,
-                0,
-                Math.PI * 2
+                150 + Math.cos(frame / 50 + i) * 50,
+                150 + Math.sin(frame / 50 + i) * 50,
+                10, 0, Math.PI * 2
             );
             ctx.fillStyle = `hsl(${frame + i * 30}, 70%, 50%)`;
             ctx.fill();
         }
 
         frame++;
-        requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
     }
 
-    animate();
+    const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+            if (!rafId) rafId = requestAnimationFrame(animate);
+        } else {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+    });
+    observer.observe(canvas);
+    rafId = requestAnimationFrame(animate);
 }
 
 function createCSSDemo() {
@@ -239,8 +246,8 @@ function createFontDemo() {
         <div class="font-samples">
             <p class="font-sample" style="font-family: system-ui;">System Font: The quick brown fox jumps over the lazy dog</p>
             <p class="font-sample" style="font-feature-settings: 'smcp' 1;">Small Caps: The quick brown fox jumps over the lazy dog</p>
-            <p class="font-sample" style="writing-mode: vertical-rl;">Vertical Text: こんにちは世界</p>
-            <p class="font-sample" style="direction: rtl;">RTL Text: مرحبا بالعالم</p>
+            <p class="font-sample" lang="ja" style="writing-mode: vertical-rl;">Vertical Text: こんにちは世界</p>
+            <p class="font-sample" lang="ar" style="direction: rtl;">RTL Text: مرحبا بالعالم</p>
         </div>
     `;
 }
@@ -259,7 +266,12 @@ function testHardwareAcceleration() {
 function testCanvasHardwareAcceleration() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { alpha: false });
-    return ctx && ctx.getContextAttributes().alpha === false;
+    if (!ctx) return false;
+    try {
+        return ctx.getContextAttributes().alpha === false;
+    } catch {
+        return true; // context exists but attributes API unsupported
+    }
 }
 
 function testFontCapabilities() {
@@ -354,6 +366,8 @@ function initShaderProgram(gl, vsSource, fsSource) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
     let rotation = 0;
+    let rafId = null;
+
     function render() {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0);
@@ -386,10 +400,19 @@ function initShaderProgram(gl, vsSource, fsSource) {
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
         rotation += 0.02;
-        requestAnimationFrame(render);
+        rafId = requestAnimationFrame(render);
     }
 
-    render();
+    const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+            if (!rafId) rafId = requestAnimationFrame(render);
+        } else {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+    });
+    observer.observe(gl.canvas);
+    rafId = requestAnimationFrame(render);
 }
 
 function loadShader(gl, type, source) {
