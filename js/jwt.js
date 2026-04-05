@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const compareDialogSummary = document.getElementById('jwtCompareDialogSummary');
     const compareDialogOutput = document.getElementById('jwtCompareDialogOutput');
     let lastCompareState = null;
+    let lastDecodedToken = null;
 
     syncHeaderAlgorithm();
     renderStatus(encodeStatus, 'Pick an algorithm, provide JSON, and generate a token.');
@@ -59,9 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('dialog-open');
     });
     compareAFromEncodeButton.addEventListener('click', () => fillCompareField(compareInputA, encodedOutput.value));
-    compareAFromDecodeButton.addEventListener('click', () => fillCompareField(compareInputA, decodeInput.value));
+    compareAFromDecodeButton.addEventListener('click', () => {
+        if (lastDecodedToken) {
+            compareInputA.value = createDecodedSnapshot(lastDecodedToken);
+            renderStatus(compareStatus, 'Snapshot copied into compare input.');
+        }
+    });
     compareBFromEncodeButton.addEventListener('click', () => fillCompareField(compareInputB, encodedOutput.value));
-    compareBFromDecodeButton.addEventListener('click', () => fillCompareField(compareInputB, decodeInput.value));
+    compareBFromDecodeButton.addEventListener('click', () => {
+        if (lastDecodedToken) {
+            compareInputB.value = createDecodedSnapshot(lastDecodedToken);
+            renderStatus(compareStatus, 'Snapshot copied into compare input.');
+        }
+    });
     encodedOutput.addEventListener('input', syncCompareButtons);
     decodeInput.addEventListener('input', syncCompareButtons);
 
@@ -112,12 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
             decodedHeader.value = prettyJson(decoded.header);
             decodedPayload.value = prettyJson(decoded.payload);
             decodedSignature.value = decoded.signature || '(empty signature)';
+            lastDecodedToken = decoded;
             syncCompareButtons();
             renderStatus(decodeStatus, `Decoded ${decoded.algorithmLabel}.`);
         } catch (error) {
             decodedHeader.value = '';
             decodedPayload.value = '';
             decodedSignature.value = '';
+            lastDecodedToken = null;
             renderStatus(decodeStatus, error.message, true);
         }
     }
@@ -189,8 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function syncCompareButtons() {
-        const hasGeneratedToken = Boolean(encodedOutput.value.trim());
-        const hasDecodedToken = Boolean(decodeInput.value.trim());
+        const hasGeneratedToken = isValidCompareSource(encodedOutput.value);
+        const hasDecodedToken = Boolean(lastDecodedToken);
 
         compareAFromEncodeButton.disabled = !hasGeneratedToken;
         compareBFromEncodeButton.disabled = !hasGeneratedToken;
@@ -198,11 +211,16 @@ document.addEventListener('DOMContentLoaded', () => {
         compareBFromDecodeButton.disabled = !hasDecodedToken;
     }
 
-    function fillCompareField(target, value) {
-        if (!value.trim()) {
+    function fillCompareField(target, value, statusContainer = compareStatus) {
+        if (!value || !value.trim()) {
             return;
         }
-        target.value = createDecodedSnapshot(parseCompareInput(value.trim()));
+        try {
+            target.value = createDecodedSnapshot(parseCompareInput(value.trim()));
+            renderStatus(statusContainer, 'Snapshot copied into compare input.');
+        } catch (error) {
+            renderStatus(statusContainer, error.message, true);
+        }
     }
 
     function openFullscreenCompare() {
@@ -235,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         decodedHeader.value = '';
         decodedPayload.value = '';
         decodedSignature.value = '';
+        lastDecodedToken = null;
         renderStatus(decodeStatus, 'Decode inputs cleared.');
         syncCompareButtons();
     }
@@ -253,6 +272,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderStatus(compareStatus, 'Compare inputs cleared.');
     }
+
+    function isValidCompareSource(value) {
+        if (!value || !value.trim()) {
+            return false;
+        }
+
+        try {
+            parseCompareInput(value.trim());
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
 });
 
 function parseJsonInput(value, label) {
