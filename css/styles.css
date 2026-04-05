@@ -7,7 +7,6 @@
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    padding: 20px;
     background-color: #f4f4f4;
     margin: 0;
 }
@@ -37,13 +36,6 @@ nav a {
 
 nav a:hover {
     background: #555;
-}
-
-/* Style for back button on sub-pages */
-nav a[href="index.html"]:not(:only-child)::before {
-    content: "←";
-    font-size: 1.2em;
-    line-height: 1;
 }
 
 /* Style for main page title */
@@ -110,6 +102,11 @@ h1 {
 .failure {
     background: #f8d7da;
     color: #721c24;
+}
+
+.info {
+    background: #e9ecef;
+    color: #343a40;
 }
 
 .visual-demo {

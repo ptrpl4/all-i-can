@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const systemData = {
         'Operating System': getOS(),
         'CPU Cores': navigator.hardwareConcurrency,
-        'Device Memory': navigator.deviceMemory + ' GB',
+        'Device Memory': navigator.deviceMemory != null ? navigator.deviceMemory + ' GB' : 'Not available',
         'Screen Resolution': `${window.screen.width}x${window.screen.height}`,
         'Color Depth': window.screen.colorDepth + ' bits',
         'Pixel Ratio': window.devicePixelRatio,
@@ -32,16 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Network Information
     const networkInfo = document.getElementById('networkInfo');
-    if ('connection' in navigator) {
-        const conn = navigator.connection;
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
         const networkData = {
-            'Connection Type': conn.effectiveType,
-            'Downlink Speed': conn.downlink + ' Mbps',
-            'Round Trip Time': conn.rtt + ' ms',
-            'Save Data Mode': conn.saveData ? 'Enabled' : 'Disabled',
-            'Network Type': conn.type
+            'Connection Type': conn.effectiveType || null,
+            'Downlink Speed': conn.downlink != null ? conn.downlink + ' Mbps' : null,
+            'Round Trip Time': conn.rtt != null ? conn.rtt + ' ms' : null,
+            'Save Data Mode': conn.saveData != null ? (conn.saveData ? 'Enabled' : 'Disabled') : null,
+            'Network Type': conn.type || null
         };
         displayData(networkInfo, networkData);
+    } else {
+        displayData(networkInfo, { 'Network Information API': 'Not available' });
     }
 
     // Location & Sensors
@@ -99,8 +101,12 @@ function displayData(container, data) {
     Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
             const div = document.createElement('div');
-            div.className = 'test-result success';
-            div.innerHTML = `<strong>${key}:</strong> ${value}`;
+            div.className = 'test-result info';
+            const label = document.createElement('strong');
+            label.textContent = key + ': ';
+            const text = document.createTextNode(value);
+            div.appendChild(label);
+            div.appendChild(text);
             container.appendChild(div);
         }
     });
