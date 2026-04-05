@@ -6,17 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasWebAuthn = 'credentials' in navigator && 'PublicKeyCredential' in window;
     showResult(webauthnTests, 'WebAuthn Basic Support', hasWebAuthn);
 
-    if (hasWebAuthn) {
-        // Check if platform authenticator is available
-        navigator.credentials.get({
-            publicKey: {
-                challenge: new Uint8Array(32),
-                rpId: window.location.hostname,
-                allowCredentials: []
-            }
-        }).catch(error => {
-            const isPlatformAuthAvailable = error.name !== 'NotSupportedError';
-            showResult(webauthnTests, 'Platform Authenticator', isPlatformAuthAvailable);
+    if (hasWebAuthn && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(available => {
+            showResult(webauthnTests, 'Platform Authenticator', available);
+        }).catch(() => {
+            showResult(webauthnTests, 'Platform Authenticator', false);
         });
     }
 
@@ -34,27 +28,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Test specific algorithms
     if (hasSubtleCrypto) {
         const algorithms = [
-            { name: 'RSA-OAEP', usage: ['encrypt', 'decrypt'] },
-            { name: 'AES-GCM', usage: ['encrypt', 'decrypt'] },
-            { name: 'ECDSA', usage: ['sign', 'verify'] },
-            { name: 'SHA-256', usage: ['digest'] }
+            {
+                name: 'RSA-OAEP',
+                params: { name: 'RSA-OAEP', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+                usage: ['encrypt', 'decrypt']
+            },
+            {
+                name: 'AES-GCM',
+                params: { name: 'AES-GCM', length: 256 },
+                usage: ['encrypt', 'decrypt']
+            },
+            {
+                name: 'ECDSA',
+                params: { name: 'ECDSA', namedCurve: 'P-256' },
+                usage: ['sign', 'verify']
+            }
         ];
 
         algorithms.forEach(algo => {
-            window.crypto.subtle.generateKey(
-                {
-                    name: algo.name,
-                    modulusLength: 2048,
-                    publicExponent: new Uint8Array([1, 0, 1]),
-                    hash: 'SHA-256'
-                },
-                true,
-                algo.usage
-            ).then(() => {
+            window.crypto.subtle.generateKey(algo.params, true, algo.usage).then(() => {
                 showResult(cryptoTests, `${algo.name} Algorithm`, true);
             }).catch(() => {
                 showResult(cryptoTests, `${algo.name} Algorithm`, false);
             });
+        });
+
+        window.crypto.subtle.digest('SHA-256', new Uint8Array([1, 2, 3])).then(() => {
+            showResult(cryptoTests, 'SHA-256 Digest', true);
+        }).catch(() => {
+            showResult(cryptoTests, 'SHA-256 Digest', false);
         });
     }
 
@@ -77,14 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasPermissionsAPI = 'permissions' in navigator;
     showResult(securityFeatureTests, 'Permissions API', hasPermissionsAPI);
 
-    // Check HTTP Strict Transport Security support
-    const hasHSTS = 'Strict-Transport-Security' in (document.createElement('meta')).dataset;
-    showResult(securityFeatureTests, 'HSTS Support', hasHSTS);
+    // HSTS is a server header — check if we're on HTTPS as a proxy indicator
+    const hasHSTS = window.location.protocol === 'https:';
+    showResult(securityFeatureTests, 'HTTPS (HSTS-eligible)', hasHSTS);
 });
 
 function showResult(container, feature, supported) {
     const div = document.createElement('div');
     div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported ? 'Supported' : 'Not Supported'}`;
+    div.textContent = `${feature}: ${supported === true || supported === false ?
+        (supported ? 'Supported' : 'Not Supported') : supported}`;
     container.appendChild(div);
-} 
+}
