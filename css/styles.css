@@ -204,6 +204,10 @@ nav a:focus-visible,
     font-weight: 500;
 }
 
+.nav-home-link {
+    flex: 0 0 auto;
+}
+
 nav a[aria-current="page"] {
     background: var(--nav-current-bg);
     color: var(--nav-current-text);
@@ -222,7 +226,6 @@ nav a[aria-current="page"] {
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s, transform 0.2s;
     white-space: nowrap;
-    min-width: 9.75rem;
     flex: 0 0 auto;
     margin-left: auto;
 }
@@ -288,18 +291,6 @@ main {
     --home-rail: var(--content-inset);
 }
 
-.home-page nav {
-    padding-inline: calc(var(--shell-gutter) + var(--home-rail));
-}
-
-.home-page .nav-home {
-    padding-inline: 0;
-}
-
-.home-page .theme-switcher {
-    padding-inline: 0.85rem;
-}
-
 .home-page .page-hero {
     padding-inline: var(--content-inset);
 }
@@ -316,11 +307,30 @@ main {
     gap: 1.65rem;
 }
 
-.home-page .eyebrow,
-.home-page h1,
-.home-page .lede,
-.home-page .feature-card > h2,
-.home-page .feature-card > p {
+.tool-page nav {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.tool-page .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tool-page .nav-links::-webkit-scrollbar {
+    display: none;
+}
+
+.tool-page .nav-link {
+    flex: 0 0 auto;
+}
+
+.tool-page .theme-switcher {
     margin-left: 0;
 }
 
@@ -468,6 +478,25 @@ h2 {
 
 .test-section > h2 {
     margin-bottom: 0.2rem;
+}
+
+.test-section > div[id]:empty:not(.visual-demo):not(.activity-log)::before,
+.activity-log:empty::before {
+    display: block;
+    padding: 0.9rem 1rem;
+    border: 1px dashed var(--surface-border-strong);
+    border-radius: 14px;
+    background: var(--accent-soft);
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.test-section > div[id]:empty:not(.visual-demo):not(.activity-log)::before {
+    content: "Running checks...";
+}
+
+.activity-log:empty::before {
+    content: "Waiting for activity...";
 }
 
 .tool-grid {
@@ -851,10 +880,18 @@ h2 {
         padding-inline: calc(0.85rem + var(--content-inset));
     }
 
+    .tool-page nav {
+        grid-template-columns: 1fr;
+    }
+
+    .tool-page .nav-links {
+        order: 3;
+        padding-bottom: 0.1rem;
+    }
+
     .theme-switcher {
         width: 100%;
-        justify-self: stretch;
-        text-align: center;
+        justify-content: space-between;
     }
 
     h1 {
@@ -877,6 +914,11 @@ h2 {
     .nav-home {
         width: 100%;
         justify-content: center;
+    }
+
+    .tool-page .nav-home-link {
+        width: auto;
+        justify-content: flex-start;
     }
 
     .tool-grid,

@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('nav a[href]');
     const pageLinks = document.querySelectorAll('a[href]');
     const themeController = window.BrowserTesterTheme;
-    const themeModes = themeController ? themeController.themeModes : ['auto', 'light', 'dark'];
     let themeMode = themeController ? themeController.loadMode() : 'auto';
 
     applyTheme(themeMode);
@@ -12,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (themeSwitcher) {
         themeSwitcher.addEventListener('click', () => {
+            const themeModes = themeController ? themeController.themeModes : ['auto', 'light', 'dark'];
             const currentIndex = themeModes.indexOf(themeMode);
             themeMode = themeModes[(currentIndex + 1) % themeModes.length];
             if (themeController) {
@@ -98,6 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         themeSwitcher.textContent = labels[themeMode];
         themeSwitcher.setAttribute('aria-label', 'Toggle theme mode');
-        themeSwitcher.setAttribute('data-theme-mode', themeMode);
+        themeSwitcher.title = labels[themeMode];
     }
 });
