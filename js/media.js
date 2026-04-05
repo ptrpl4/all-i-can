@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult } = window.BrowserTester;
+
     // Test image formats
     const imageFormats = [
         { format: 'WebP', src: 'data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==' },
@@ -49,11 +51,3 @@ document.addEventListener('DOMContentLoaded', () => {
         showResult(audioTests, `${format} Format`, support !== '');
     });
 });
-
-function showResult(container, feature, supported) {
-    const div = document.createElement('div');
-    div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported === true || supported === false ?
-        (supported ? 'Supported' : 'Not Supported') : supported}`;
-    container.appendChild(div);
-}

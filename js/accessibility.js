@@ -1,25 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult, showInfo } = window.BrowserTester;
+
     // Screen Reader Tests
     const screenReaderTests = document.getElementById('screenReaderTests');
     
+    showInfo(screenReaderTests, 'Scope', 'These checks cover DOM and CSS APIs related to accessibility, not assistive technology behavior.');
+
     // Test ARIA support
     const hasARIA = testARIASupport();
-    showResult(screenReaderTests, 'ARIA Support', hasARIA);
+    showResult(screenReaderTests, 'ARIA Role Attribute Reflection', hasARIA);
 
     // Test role attribute
     const hasRoles = testRoleAttribute();
-    showResult(screenReaderTests, 'Role Attribute', hasRoles);
+    showResult(screenReaderTests, 'Common Role Attribute Reflection', hasRoles);
 
     // Test live regions
     const hasLiveRegions = testLiveRegions();
-    showResult(screenReaderTests, 'Live Regions', hasLiveRegions);
+    showResult(screenReaderTests, 'aria-live Attribute Reflection', hasLiveRegions);
 
     // Keyboard Navigation Tests
     const keyboardTests = document.getElementById('keyboardTests');
     
     // Test focus management
     const hasFocus = testFocusManagement();
-    showResult(keyboardTests, 'Focus Management', hasFocus);
+    showResult(keyboardTests, 'Element.focus API', hasFocus);
 
     // Test tab index
     const hasTabIndex = testTabIndex();
@@ -27,18 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Test keyboard events
     const hasKeyboardEvents = testKeyboardEvents();
-    showResult(keyboardTests, 'Keyboard Events', hasKeyboardEvents);
+    showResult(keyboardTests, 'KeyboardEvent Interface', hasKeyboardEvents);
 
     // High Contrast Tests
     const contrastTests = document.getElementById('contrastTests');
     
     // Test media queries
     const hasContrastQueries = testContrastQueries();
-    showResult(contrastTests, 'Contrast Media Queries', hasContrastQueries);
+    showResult(contrastTests, 'prefers-contrast Media Query Parsing', hasContrastQueries);
 
     // Test forced colors
     const hasForcedColors = testForcedColors();
-    showResult(contrastTests, 'Forced Colors Mode', hasForcedColors);
+    showResult(contrastTests, 'forced-colors Media Query Parsing', hasForcedColors);
 
     // ARIA Support Tests
     const ariaTests = document.getElementById('ariaTests');
@@ -46,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Test specific ARIA attributes
     const ariaAttributes = testARIAAttributes();
     Object.entries(ariaAttributes).forEach(([attr, supported]) => {
-        showResult(ariaTests, `ARIA ${attr}`, supported);
+        showResult(ariaTests, `ARIA ${attr} Attribute Reflection`, supported);
     });
 });
 
@@ -115,12 +119,4 @@ function testARIAAttributes() {
         acc[key] = el.getAttribute(attr) === 'test';
         return acc;
     }, {});
-}
-
-function showResult(container, feature, supported) {
-    const div = document.createElement('div');
-    div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported === true || supported === false ?
-        (supported ? 'Supported' : 'Not Supported') : supported}`;
-    container.appendChild(div);
 }

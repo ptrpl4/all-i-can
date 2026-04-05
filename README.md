@@ -1,26 +1,27 @@
 # Browser Capabilities Tester
 
-A comprehensive web-based tool for testing and displaying browser capabilities, features, and user interactions.
+A static browser test site for checking browser APIs, media support, graphics capabilities, page context, and user interaction events.
 
-Built with pure JavaScript, HTML, and CSS - no frameworks or dependencies.
+Built with plain HTML, CSS, and JavaScript. The graphics page currently uses `gl-matrix` from a CDN for the WebGL demo.
 
 ## Features
 
-- **Media Support**: Test image formats, video codecs, and audio capabilities
-- **Forms & Input**: Check HTML5 form elements and input types support
-- **Security Features**: Test WebAuthn, encryption, and security APIs
-- **Web APIs**: Verify support for modern web APIs
-- **User Data**: View browser, system, and network information
-- **Graphics**: Test WebGL, Canvas, CSS, and SVG capabilities
-- **Performance**: Measure JavaScript, DOM, and network performance
-- **Accessibility**: Check screen reader and ARIA support
-- **Activity Tracking**: Monitor user interactions and browser events
+- **Media Support**: Test image formats, video codecs, and audio format support
+- **Forms & Input**: Check input types and built-in form features
+- **Security APIs**: Check WebAuthn, Web Crypto, and current page security context
+- **Web APIs**: Verify support for storage, device, communication, and performance APIs
+- **User Data**: Display browser, system, network, and preference information exposed by the runtime
+- **Graphics**: Test WebGL, Canvas, CSS, SVG, and font-related capabilities
+- **Performance**: Run lightweight JavaScript and DOM benchmarks
+- **Accessibility-Related APIs**: Check DOM and CSS APIs related to accessibility
+- **Activity Tracking**: Monitor user interactions and browser events on the current page
 
 ## Technologies
 
-- Pure JavaScript (No frameworks or libraries)
+- Plain JavaScript
 - HTML5
 - CSS3
+- `gl-matrix` via CDN on the graphics page
 - Hosted on GitHub Pages
 
 ## Browser Support
@@ -34,25 +35,26 @@ Works in modern browsers that support:
 - Modern JavaScript (ES6+)
 - HTML5 and CSS3
 - WebGL for graphics testing
-- WebRTC for media capabilities
 
 ### Tested Browsers
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+- Not currently tracked in this repository
 
 ### API Support
 - Geolocation API
 - WebAuthn
 - Crypto API
-- Media Devices
 - WebGL and Canvas
 - IndexedDB and LocalStorage
-- Service Workers
+- Network Information API where available
 
 ### Security Features
-- Content Security Policy (CSP)
-- Cross-Origin Resource Sharing (CORS)
-- Secure Context requirements
-- Modern encryption standards 
+- Current page secure-context state
+- Current page cross-origin isolation state
+- HTTPS page load state
+- Web Crypto algorithm availability
+
+## Notes
+
+- Results reflect the current browser and page context. Some checks are affected by HTTPS, permissions, browser policy, or cross-origin isolation.
+- The accessibility page does not test real assistive technology behavior. It reports browser-exposed DOM and CSS features related to accessibility.
+- HSTS and other server-side policies cannot be fully verified from client-side JavaScript alone.

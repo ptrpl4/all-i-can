@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult } = window.BrowserTester;
+
     // Browser Information
     const browserInfo = document.getElementById('browserInfo');
     const browserData = {
@@ -12,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'PDF Viewer Built-in': navigator.pdfViewerEnabled,
         'Browser Vendor': navigator.vendor,
         'Browser Version': navigator.appVersion,
-        'Browser Platform': navigator.platform
+        'Browser Platform Hint': getPlatformHint()
     };
     displayData(browserInfo, browserData);
 
@@ -100,37 +102,37 @@ document.addEventListener('DOMContentLoaded', () => {
 function displayData(container, data) {
     Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-            const div = document.createElement('div');
-            div.className = 'test-result info';
-            const label = document.createElement('strong');
-            label.textContent = key + ': ';
-            const text = document.createTextNode(value);
-            div.appendChild(label);
-            div.appendChild(text);
-            container.appendChild(div);
+            window.BrowserTester.showResult(container, key, String(value));
         }
     });
 }
 
 function getOS() {
     const userAgent = window.navigator.userAgent;
-    const platform = window.navigator.platform;
-    const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-    const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-    const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+    const userAgentDataPlatform = navigator.userAgentData && navigator.userAgentData.platform;
 
-    if (macosPlatforms.indexOf(platform) !== -1) {
-        return 'macOS';
-    } else if (iosPlatforms.indexOf(platform) !== -1) {
+    if (userAgentDataPlatform) {
+        return userAgentDataPlatform;
+    } else if (/iPhone|iPad|iPod/.test(userAgent)) {
         return 'iOS';
-    } else if (windowsPlatforms.indexOf(platform) !== -1) {
+    } else if (/Mac OS X|Macintosh/.test(userAgent)) {
+        return 'macOS';
+    } else if (/Windows/.test(userAgent)) {
         return 'Windows';
     } else if (/Android/.test(userAgent)) {
         return 'Android';
-    } else if (/Linux/.test(platform)) {
+    } else if (/Linux|X11/.test(userAgent)) {
         return 'Linux';
     }
     return 'Unknown';
+}
+
+function getPlatformHint() {
+    if (navigator.userAgentData && navigator.userAgentData.platform) {
+        return navigator.userAgentData.platform;
+    }
+
+    return 'Not exposed';
 }
 
 function getDeviceType() {

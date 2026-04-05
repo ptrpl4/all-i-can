@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult, showPending } = window.BrowserTester;
+
     const jsPerformance = document.getElementById('jsPerformance');
     const domPerformance = document.getElementById('domPerformance');
     const networkPerformance = document.getElementById('networkPerformance');
@@ -61,13 +63,13 @@ function scheduleTask(fn) {
 function showNetworkInfo(container) {
     const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (!conn) {
-        showResult(container, 'Network Information API', 'Not available');
+        window.BrowserTester.showResult(container, 'Network Information API', 'Not available');
         return;
     }
-    if (conn.downlink != null)  showResult(container, 'Downlink', `${conn.downlink} Mbps`);
-    if (conn.rtt != null)       showResult(container, 'Round-Trip Time', `${conn.rtt}ms`);
-    if (conn.effectiveType)     showResult(container, 'Effective Type', conn.effectiveType);
-    if (conn.saveData != null)  showResult(container, 'Save Data Mode', conn.saveData ? 'On' : 'Off');
+    if (conn.downlink != null)  window.BrowserTester.showResult(container, 'Downlink', `${conn.downlink} Mbps`);
+    if (conn.rtt != null)       window.BrowserTester.showResult(container, 'Round-Trip Time', `${conn.rtt}ms`);
+    if (conn.effectiveType)     window.BrowserTester.showResult(container, 'Effective Type', conn.effectiveType);
+    if (conn.saveData != null)  window.BrowserTester.showResult(container, 'Save Data Mode', conn.saveData ? 'On' : 'Off');
 }
 
 function testArrayOperations() {
@@ -139,20 +141,4 @@ function formatBytes(bytes) {
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
-}
-
-function showPending(container, feature) {
-    const div = document.createElement('div');
-    div.className = 'test-result';
-    div.style.color = '#666';
-    div.textContent = `${feature}: Running\u2026`;
-    container.appendChild(div);
-    return div;
-}
-
-function showResult(container, feature, value) {
-    const div = document.createElement('div');
-    div.className = 'test-result success';
-    div.textContent = `${feature}: ${value}`;
-    container.appendChild(div);
 }

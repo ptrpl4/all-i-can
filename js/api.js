@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult, showInfo } = window.BrowserTester;
+
     // Test Storage APIs
     const storageTests = document.getElementById('storageTests');
     
@@ -74,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // SharedArrayBuffer (Parallel Processing)
     const hasSharedArrayBuffer = 'SharedArrayBuffer' in window;
     showResult(performanceTests, 'SharedArrayBuffer', hasSharedArrayBuffer);
+    if (hasSharedArrayBuffer && !window.crossOriginIsolated) {
+        showInfo(performanceTests, 'SharedArrayBuffer Context', 'Present, but full use usually requires a cross-origin isolated page.');
+    }
 
     // Additional Modern APIs
     if (hasPerformance) {
@@ -86,11 +91,3 @@ document.addEventListener('DOMContentLoaded', () => {
         showResult(performanceTests, 'Resource Timing', hasResourceTiming);
     }
 });
-
-function showResult(container, feature, supported) {
-    const div = document.createElement('div');
-    div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported === true || supported === false ?
-        (supported ? 'Supported' : 'Not Supported') : supported}`;
-    container.appendChild(div);
-}

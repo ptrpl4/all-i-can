@@ -5,24 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Features - Browser Tester</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
-        <a href="../index.html">← Back to Home</a>
+        <a href="../index.html">Home</a>
+        <a href="media.html">Media</a>
+        <a href="forms.html">Forms</a>
+        <a href="security.html" aria-current="page">Security</a>
+        <a href="api.html">APIs</a>
+        <a href="data.html">Data</a>
+        <a href="graphics.html">Graphics</a>
+        <a href="performance.html">Performance</a>
+        <a href="accessibility.html">Accessibility</a>
+        <a href="activity.html">Activity</a>
     </nav>
-    <main>
-        <h1>Security Features Test</h1>
+    <main id="main-content">
+        <h1>Security APIs and Page Context</h1>
         <div class="test-container">
-            <h2>WebAuthn Support</h2>
+            <h2>Authentication APIs</h2>
             <div id="webauthnTests"></div>
             
-            <h2>Crypto API Support</h2>
+            <h2>Crypto APIs</h2>
             <div id="cryptoTests"></div>
             
-            <h2>Security Headers & Features</h2>
+            <h2>Current Page Security Context</h2>
             <div id="securityFeatureTests"></div>
         </div>
     </main>
+    <script src="../js/utils.js"></script>
     <script src="../js/security.js"></script>
 </body>
 </html> 

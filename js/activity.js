@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyboardLog = document.getElementById('keyboardActivity');
     const browserLog = document.getElementById('browserActivity');
     const interactionLog = document.getElementById('interactionActivity');
+    let lastMouseLogAt = 0;
 
     function addLogEntry(container, message) {
         const entry = document.createElement('div');
@@ -18,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mouse tracking
     document.addEventListener('mousemove', (e) => {
+        const now = Date.now();
+        if (now - lastMouseLogAt < 750) {
+            return;
+        }
+        lastMouseLogAt = now;
         addLogEntry(mouseLog, `Mouse moved to (${e.clientX}, ${e.clientY})`);
     });
 
@@ -61,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    setInterval(checkDevTools, 1000);
+    const devToolsIntervalId = window.setInterval(checkDevTools, 1000);
 
     // Page interactions
     document.addEventListener('copy', () => {
@@ -79,4 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         addLogEntry(browserLog, `Page ${document.hidden ? 'hidden' : 'visible'}`);
     });
-}); 
+
+    window.addEventListener('beforeunload', () => {
+        window.clearInterval(devToolsIntervalId);
+    });
+});

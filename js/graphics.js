@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { showResult } = window.BrowserTester;
+
     // WebGL Tests
     const webglTests = document.getElementById('webglTests');
     
@@ -102,14 +104,6 @@ function testSVGFilters() {
     return 'filter' in svg && filter instanceof SVGElement;
 }
 
-function showResult(container, feature, supported) {
-    const div = document.createElement('div');
-    div.className = `test-result ${supported ? 'success' : 'failure'}`;
-    div.textContent = `${feature}: ${supported === true || supported === false ? 
-        (supported ? 'Supported' : 'Not Supported') : supported}`;
-    container.appendChild(div);
-}
-
 function createWebGLDemo() {
     const container = document.getElementById('webglDemo');
     const canvas = document.createElement('canvas');
@@ -120,6 +114,10 @@ function createWebGLDemo() {
 
     const gl = canvas.getContext('webgl');
     if (!gl) return;
+    if (!window.mat4) {
+        window.BrowserTester.showInfo(container, 'WebGL Demo', 'The matrix helper library did not load, so the 3D demo is unavailable.');
+        return;
+    }
 
     // Create a rotating cube
     const vsSource = `
@@ -155,6 +153,7 @@ function createCanvasDemo() {
     container.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     let frame = 0;
     let rafId = null;
 
@@ -176,15 +175,20 @@ function createCanvasDemo() {
         rafId = requestAnimationFrame(animate);
     }
 
-    const observer = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) {
-            if (!rafId) rafId = requestAnimationFrame(animate);
-        } else {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        }
-    });
-    observer.observe(canvas);
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                if (!rafId) rafId = requestAnimationFrame(animate);
+            } else {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        });
+        observer.observe(canvas);
+        rafId = requestAnimationFrame(animate);
+        return;
+    }
+
     rafId = requestAnimationFrame(animate);
 }
 
@@ -403,15 +407,20 @@ function initShaderProgram(gl, vsSource, fsSource) {
         rafId = requestAnimationFrame(render);
     }
 
-    const observer = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) {
-            if (!rafId) rafId = requestAnimationFrame(render);
-        } else {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-        }
-    });
-    observer.observe(gl.canvas);
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                if (!rafId) rafId = requestAnimationFrame(render);
+            } else {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        });
+        observer.observe(gl.canvas);
+        rafId = requestAnimationFrame(render);
+        return;
+    }
+
     rafId = requestAnimationFrame(render);
 }
 

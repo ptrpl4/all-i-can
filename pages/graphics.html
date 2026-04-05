@@ -5,12 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphics & Media - Browser Tester</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav>
-        <a href="../index.html">← Back to Home</a>
+        <a href="../index.html">Home</a>
+        <a href="media.html">Media</a>
+        <a href="forms.html">Forms</a>
+        <a href="security.html">Security</a>
+        <a href="api.html">APIs</a>
+        <a href="data.html">Data</a>
+        <a href="graphics.html" aria-current="page">Graphics</a>
+        <a href="performance.html">Performance</a>
+        <a href="accessibility.html">Accessibility</a>
+        <a href="activity.html">Activity</a>
     </nav>
-    <main>
+    <main id="main-content">
         <h1>Graphics & Media Tests</h1>
         <div class="test-container">
             <h2>WebGL Capabilities</h2>
@@ -38,6 +49,7 @@
         </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script src="../js/utils.js"></script>
     <script src="../js/graphics.js"></script>
 </body>
 </html> 
