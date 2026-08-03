@@ -9,6 +9,7 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body class="tool-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav class="tool-nav">
         <a href="../index.html" class="nav-link nav-home-link">Home</a>
         <div class="nav-links">
@@ -25,7 +26,7 @@
         </div>
         <button id="themeSwitcher" class="theme-switcher" type="button">Theme: Auto</button>
     </nav>
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
         <header class="page-hero">
             <p class="eyebrow">JWT</p>
             <h1>JWT Encode, Decode, and Compare</h1>
@@ -103,22 +104,22 @@
             <section class="test-section">
                 <h2>Compare Two Encoded JWTs</h2>
                 <div class="tool-grid compare-grid">
-                    <label class="field field-wide">
-                        <span>JWT A</span>
+                    <div class="field field-wide">
+                        <label for="jwtCompareA"><span>JWT A</span></label>
                         <div class="field-actions">
                             <button id="jwtCompareAFromEncode" class="secondary-btn" type="button" disabled>Use Generated Snapshot</button>
                             <button id="jwtCompareAFromDecode" class="secondary-btn" type="button" disabled>Use Decoded Snapshot</button>
                         </div>
                         <textarea id="jwtCompareA" rows="8" spellcheck="false" placeholder="Paste an encoded JWT or a decoded snapshot"></textarea>
-                    </label>
-                    <label class="field field-wide">
-                        <span>JWT B</span>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="jwtCompareB"><span>JWT B</span></label>
                         <div class="field-actions">
                             <button id="jwtCompareBFromEncode" class="secondary-btn" type="button" disabled>Use Generated Snapshot</button>
                             <button id="jwtCompareBFromDecode" class="secondary-btn" type="button" disabled>Use Decoded Snapshot</button>
                         </div>
                         <textarea id="jwtCompareB" rows="8" spellcheck="false" placeholder="Paste an encoded JWT or a decoded snapshot"></textarea>
-                    </label>
+                    </div>
                 </div>
                 <div class="tool-actions">
                     <button id="jwtCompareButton" class="action-btn" type="button">Compare JWTs</button>

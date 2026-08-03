@@ -167,15 +167,22 @@ document.addEventListener('DOMContentLoaded', () => {
             fragment.appendChild(createDiffBlock('Payload Fields', diffObjects(tokenA.payload, tokenB.payload)));
             changeCount += countChanges(diffObjects(tokenA.payload, tokenB.payload));
 
-            diffSummary.innerHTML = '';
-            showInfo(diffSummary, 'Comparison Summary', changeCount === 0
+            const summaryMessage = changeCount === 0
                 ? 'No decoded differences found between the two JWTs.'
-                : `${changeCount} difference${changeCount === 1 ? '' : 's'} found between the two JWTs.`);
+                : `${changeCount} difference${changeCount === 1 ? '' : 's'} found between the two JWTs.`;
+
+            diffSummary.innerHTML = '';
+            showInfo(diffSummary, 'Comparison Summary', summaryMessage);
 
             diffOutput.appendChild(fragment);
+
+            // The clone is re-rendered inside the dialog, so it must not carry
+            // the id of the element it was copied from.
+            const outputNode = diffOutput.cloneNode(true);
+            outputNode.removeAttribute('id');
             lastCompareState = {
-                summaryText: diffSummary.textContent,
-                outputNode: diffOutput.cloneNode(true)
+                summaryText: summaryMessage,
+                outputNode
             };
             fullscreenButton.disabled = false;
             renderStatus(compareStatus, 'JWT comparison complete.');

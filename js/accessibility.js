@@ -1,56 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { showResult, showInfo } = window.BrowserTester;
+    const { showResult, showInfo, runSection } = window.BrowserTester;
 
     // Screen Reader Tests
     const screenReaderTests = document.getElementById('screenReaderTests');
-    
-    showInfo(screenReaderTests, 'Scope', 'These checks cover DOM and CSS APIs related to accessibility, not assistive technology behavior.');
 
-    // Test ARIA support
-    const hasARIA = testARIASupport();
-    showResult(screenReaderTests, 'ARIA Role Attribute Reflection', hasARIA);
+    runSection('ARIA and DOM Semantics', screenReaderTests, () => {
+        showInfo(screenReaderTests, 'Scope', 'These checks cover DOM and CSS APIs related to accessibility, not assistive technology behavior.');
 
-    // Test role attribute
-    const hasRoles = testRoleAttribute();
-    showResult(screenReaderTests, 'Common Role Attribute Reflection', hasRoles);
+        // Test ARIA support
+        const hasARIA = testARIASupport();
+        showResult(screenReaderTests, 'ARIA Role Attribute Reflection', hasARIA);
 
-    // Test live regions
-    const hasLiveRegions = testLiveRegions();
-    showResult(screenReaderTests, 'aria-live Attribute Reflection', hasLiveRegions);
+        // Test role attribute
+        const hasRoles = testRoleAttribute();
+        showResult(screenReaderTests, 'Common Role Attribute Reflection', hasRoles);
+
+        // Test live regions
+        const hasLiveRegions = testLiveRegions();
+        showResult(screenReaderTests, 'aria-live Attribute Reflection', hasLiveRegions);
+    });
 
     // Keyboard Navigation Tests
     const keyboardTests = document.getElementById('keyboardTests');
-    
-    // Test focus management
-    const hasFocus = testFocusManagement();
-    showResult(keyboardTests, 'Element.focus API', hasFocus);
 
-    // Test tab index
-    const hasTabIndex = testTabIndex();
-    showResult(keyboardTests, 'Tab Index', hasTabIndex);
+    runSection('Keyboard-Related APIs', keyboardTests, () => {
+        // Test focus management
+        const hasFocus = testFocusManagement();
+        showResult(keyboardTests, 'Element.focus API', hasFocus);
 
-    // Test keyboard events
-    const hasKeyboardEvents = testKeyboardEvents();
-    showResult(keyboardTests, 'KeyboardEvent Interface', hasKeyboardEvents);
+        // Test tab index
+        const hasTabIndex = testTabIndex();
+        showResult(keyboardTests, 'Tab Index', hasTabIndex);
+
+        // Test keyboard events
+        const hasKeyboardEvents = testKeyboardEvents();
+        showResult(keyboardTests, 'KeyboardEvent Interface', hasKeyboardEvents);
+    });
 
     // High Contrast Tests
     const contrastTests = document.getElementById('contrastTests');
-    
-    // Test media queries
-    const hasContrastQueries = testContrastQueries();
-    showResult(contrastTests, 'prefers-contrast Media Query Parsing', hasContrastQueries);
 
-    // Test forced colors
-    const hasForcedColors = testForcedColors();
-    showResult(contrastTests, 'forced-colors Media Query Parsing', hasForcedColors);
+    runSection('User Preference Media Queries', contrastTests, () => {
+        // Test media queries
+        const hasContrastQueries = testContrastQueries();
+        showResult(contrastTests, 'prefers-contrast Media Query Parsing', hasContrastQueries);
+
+        // Test forced colors
+        const hasForcedColors = testForcedColors();
+        showResult(contrastTests, 'forced-colors Media Query Parsing', hasForcedColors);
+    });
 
     // ARIA Support Tests
     const ariaTests = document.getElementById('ariaTests');
-    
-    // Test specific ARIA attributes
-    const ariaAttributes = testARIAAttributes();
-    Object.entries(ariaAttributes).forEach(([attr, supported]) => {
-        showResult(ariaTests, `ARIA ${attr} Attribute Reflection`, supported);
+
+    runSection('ARIA Attribute Reflection', ariaTests, () => {
+        // Test specific ARIA attributes
+        const ariaAttributes = testARIAAttributes();
+        Object.entries(ariaAttributes).forEach(([attr, supported]) => {
+            showResult(ariaTests, `ARIA ${attr} Attribute Reflection`, supported);
+        });
     });
 });
 
@@ -91,14 +99,18 @@ function testKeyboardEvents() {
     return 'KeyboardEvent' in window;
 }
 
+// An unparsable media query serializes back as "not all", which is how a
+// browser signals it does not understand the feature.
+function supportsMediaQuery(query) {
+    return 'matchMedia' in window && window.matchMedia(query).media !== 'not all';
+}
+
 function testContrastQueries() {
-    return 'matchMedia' in window && 
-           window.matchMedia('(prefers-contrast: more)').toString() !== 'not all';
+    return supportsMediaQuery('(prefers-contrast: more)');
 }
 
 function testForcedColors() {
-    return 'matchMedia' in window && 
-           window.matchMedia('(forced-colors)').toString() !== 'not all';
+    return supportsMediaQuery('(forced-colors: active)');
 }
 
 function testARIAAttributes() {

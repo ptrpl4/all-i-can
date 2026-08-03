@@ -1,5 +1,7 @@
-html {
-    scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
 }
 
 :root {
@@ -136,6 +138,30 @@ body {
 
 body.dialog-open {
     overflow: hidden;
+}
+
+/* Fixed rather than absolute so it stays reachable when the page is scrolled. */
+.skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    padding: 0.7rem 1.1rem;
+    background: var(--nav-current-bg);
+    color: var(--nav-current-text);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 0 0 var(--radius-sm) 0;
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.skip-link:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
 }
 
 nav {

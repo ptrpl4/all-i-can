@@ -1,52 +1,59 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { showResult, showPending } = window.BrowserTester;
+    const { showResult, showPending, updateResult, markError, runSection } = window.BrowserTester;
 
     const jsPerformance = document.getElementById('jsPerformance');
     const domPerformance = document.getElementById('domPerformance');
     const networkPerformance = document.getElementById('networkPerformance');
     const memoryTests = document.getElementById('memoryTests');
 
-    // Show placeholders while JS benchmarks run asynchronously
-    const jsBenchmarks = [
-        { label: 'Array Operations', fn: testArrayOperations },
-        { label: 'Object Operations', fn: testObjectOperations },
-        { label: 'Math Operations', fn: testMathOperations },
-    ];
-
-    jsBenchmarks.forEach(({ label, fn }) => {
-        const placeholder = showPending(jsPerformance, label);
+    // Queue a benchmark behind a pending row, then resolve that row in place
+    function queueBenchmark(container, label, fn) {
+        const placeholder = showPending(container, label);
         scheduleTask(() => {
-            const ms = fn();
-            placeholder.textContent = `${label}: ${ms.toFixed(2)}ms`;
+            try {
+                updateResult(placeholder, label, `${fn().toFixed(2)}ms`);
+            } catch (error) {
+                markError(placeholder, label, `Benchmark errored: ${error.message}`);
+                console.error(`[${label}]`, error);
+            }
         });
+    }
+
+    runSection('JavaScript Performance', jsPerformance, () => {
+        const jsBenchmarks = [
+            { label: 'Array Operations', fn: testArrayOperations },
+            { label: 'Object Operations', fn: testObjectOperations },
+            { label: 'Math Operations', fn: testMathOperations },
+        ];
+
+        jsBenchmarks.forEach(({ label, fn }) => queueBenchmark(jsPerformance, label, fn));
     });
 
     // DOM benchmarks — run after JS benchmarks to avoid contention
-    const domBenchmarks = [
-        { label: 'DOM Creation (1000 elements)', fn: testDOMCreation },
-        { label: 'DOM Manipulation', fn: testDOMManipulation },
-        { label: 'Event Handling', fn: testEventHandling },
-    ];
+    runSection('DOM Operations', domPerformance, () => {
+        const domBenchmarks = [
+            { label: 'DOM Creation (1000 elements)', fn: testDOMCreation },
+            { label: 'DOM Manipulation', fn: testDOMManipulation },
+            { label: 'Event Handling', fn: testEventHandling },
+        ];
 
-    domBenchmarks.forEach(({ label, fn }) => {
-        const placeholder = showPending(domPerformance, label);
-        scheduleTask(() => {
-            const ms = fn();
-            placeholder.textContent = `${label}: ${ms.toFixed(2)}ms`;
-        });
+        domBenchmarks.forEach(({ label, fn }) => queueBenchmark(domPerformance, label, fn));
     });
 
     // Network — use navigator.connection if available, no cross-origin fetch
-    showNetworkInfo(networkPerformance);
+    runSection('Network Capabilities', networkPerformance, () => {
+        showNetworkInfo(networkPerformance);
+    });
 
-    // Memory
-    if (performance.memory) {
-        showResult(memoryTests, 'Heap Size Limit', formatBytes(performance.memory.jsHeapSizeLimit));
-        showResult(memoryTests, 'Total Heap Size', formatBytes(performance.memory.totalJSHeapSize));
-        showResult(memoryTests, 'Used Heap Size', formatBytes(performance.memory.usedJSHeapSize));
-    } else {
-        showResult(memoryTests, 'Memory API', 'Not available');
-    }
+    runSection('Memory Usage', memoryTests, () => {
+        if (performance.memory) {
+            showResult(memoryTests, 'Heap Size Limit', formatBytes(performance.memory.jsHeapSizeLimit));
+            showResult(memoryTests, 'Total Heap Size', formatBytes(performance.memory.totalJSHeapSize));
+            showResult(memoryTests, 'Used Heap Size', formatBytes(performance.memory.usedJSHeapSize));
+        } else {
+            showResult(memoryTests, 'Memory API', 'Not available');
+        }
+    });
 });
 
 // Queue tasks so they don't all run in one long frame
