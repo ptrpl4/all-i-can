@@ -49,6 +49,8 @@ Label rows for what is actually measured. Where a capability is not observable f
 ### Reduced motion
 `prefers-reduced-motion: reduce` is honored in three places, and new motion must honor it too: CSS animations and `scroll-behavior` are gated in `styles.css`, the nav's scroll-to-top in `ui.js` passes `behavior: 'auto'`, and the Graphics demos (canvas, WebGL, CSS keyframes, SVG SMIL) draw one static frame instead of starting a loop.
 
+The Graphics demos read the preference once, when the demo is built — unlike the theme system, they do not subscribe to `change`. Toggling the OS setting takes effect on the next reload.
+
 ### WebGL contexts
 Contexts are a limited per-document resource, so probes go through `withWebGLContext(type, fn)` in `graphics.js`, which releases via `WEBGL_lose_context` when done. Only the on-screen demo canvas holds a context for the life of the page.
 
@@ -100,6 +102,9 @@ Severity: **P0** = broken/visible to users, **P1** = incorrect behavior, **P2** 
 ### ARCH-03: `runSection` guards are per-section, not per-test
 - `runSection` stops one section from killing the next, but a throw still skips the remaining rows *within* its own section. Fine for now; revisit if individual checks start failing in ways that matter.
 
+### ARCH-04: Six feature scripts still have no `runSection` guard
+- `media.js`, `forms.js`, `security.js`, `api.js`, `activity.js`, and `jwt.js` still run their sections unguarded, so a throw in one truncates the rest of the page. Convert them the way `accessibility.js` and `data.js` are written: one `runSection(label, container, fn)` per `<section>`.
+
 ### NOTE-03: Accessibility tests don't test accessibility
 - `js/accessibility.js` mostly proves `setAttribute`/`getAttribute` works, which every browser passes. It doesn't exercise screen-reader behavior, focus management, or any real a11y API. The media-query checks are now real (`.media`), and the page carries a "Scope" row, but the reflection rows are still near-tautological.
 
@@ -118,7 +123,7 @@ Severity: **P0** = broken/visible to users, **P1** = incorrect behavior, **P2** 
 - `.btn` / nav / fields now have `:focus-visible` styles.
 - Activity logs use `role="log"` + `aria-live="polite"`.
 - `gl-matrix` CDN dependency removed from `pages/graphics.html`.
-- ARCH-01 / ARCH-02 — `runSection` + `showError`/`markError` added; every feature script wraps its sections, and a throw now renders an ERROR row instead of silently truncating the page.
+- ARCH-01 / ARCH-02 — `runSection` + `showError`/`markError` added, and a throw now renders an ERROR row instead of silently truncating the page. Wired up in `accessibility.js`, `data.js`, `graphics.js`, and `performance.js`; see ARCH-04 for the six scripts still unguarded.
 - A11Y-05 — skip link on all 11 pages, `<main>` given `tabindex="-1"`.
 - NOTE-04 — obsolete. `navigator.platform` is gone; `getOS()` uses `userAgentData.platform` with UA fallbacks.
 - Pending rows resolve correctly — benchmarks in `js/performance.js` no longer display as `PENDING` forever (`updateResult`).

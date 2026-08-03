@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showInfo(hardwareTests, 'Scope', 'Browsers do not expose whether compositing or canvas painting is GPU-backed. These rows report the GPU strings the driver is willing to share, plus support for CSS properties commonly used to request a compositing layer.');
 
         const renderer = withWebGLContext('webgl', gl => readRendererStrings(gl));
-        showResult(hardwareTests, 'Reported GPU Renderer', renderer ? renderer.renderer : 'Not available');
+        showResult(hardwareTests, 'Reported GPU Renderer', (renderer && renderer.renderer) || 'Not available');
         showResult(hardwareTests, 'Unmasked Renderer Exposed', Boolean(renderer && renderer.unmasked));
         showResult(hardwareTests, 'WebGL 2.0 Available', testWebGL('webgl2'));
         showResult(hardwareTests, 'Compositing Hint: translate3d', CSS.supports('transform', 'translate3d(0,0,0)'));
@@ -395,10 +395,28 @@ function testEmojiSupport() {
         return false;
     }
 
-    // U+FFFF is a permanent non-character, so it always paints the fallback
-    // glyph. A font with real emoji coverage renders something different.
-    const fallback = paintGlyph(ctx, '\uFFFF');
+    // A colour emoji font paints non-grey pixels. Nothing in the fallback path
+    // does, so this alone settles the question.
+    if (hasColorPixels(emoji)) {
+        return true;
+    }
+
+    // Otherwise compare against an unassigned code point. U+E0000 has no font
+    // coverage anywhere, so it takes the same fallback path an unsupported
+    // emoji would. A noncharacter such as U+FFFF does not: engines special-case
+    // noncharacters before font fallback, and may blank them while still
+    // drawing a box for the emoji, which reads as support that isn't there.
+    const fallback = paintGlyph(ctx, '\u{E0000}');
     return emoji.some((value, index) => value !== fallback[index]);
+}
+
+function hasColorPixels(data) {
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] !== 0 && (data[i] !== data[i + 1] || data[i + 1] !== data[i + 2])) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Complete WebGL demo implementation

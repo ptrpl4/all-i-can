@@ -69,14 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
         requestButton.textContent = 'Request location';
         locationInfo.appendChild(requestButton);
 
+        // Rows land below the button, and a repeat request rewrites them
+        // instead of appending a second set.
+        const positionOutput = document.createElement('div');
+        locationInfo.appendChild(positionOutput);
+
         requestButton.addEventListener('click', () => {
             requestButton.disabled = true;
-            const pending = showPending(locationInfo, 'Current Position');
+            positionOutput.textContent = '';
+            const pending = showPending(positionOutput, 'Current Position');
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    requestButton.disabled = false;
                     updateResult(pending, 'Current Position', 'Received');
-                    displayData(locationInfo, {
+                    displayData(positionOutput, {
                         'Latitude': position.coords.latitude,
                         'Longitude': position.coords.longitude,
                         'Accuracy': position.coords.accuracy + ' meters',
@@ -86,9 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 },
                 (error) => {
-                    updateResult(pending, 'Current Position', `Denied or unavailable (${error.message})`);
                     requestButton.disabled = false;
-                }
+                    updateResult(pending, 'Current Position', `Denied or unavailable (${error.message})`);
+                },
+                // Without a timeout the request hangs indefinitely on a device
+                // with no location provider, stranding the row on "Running...".
+                { timeout: 10000 }
             );
         });
     });
