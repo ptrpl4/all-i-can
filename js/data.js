@@ -14,8 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'Maximum Touch Points': navigator.maxTouchPoints,
             'PDF Viewer Built-in': navigator.pdfViewerEnabled,
             'Browser Vendor': navigator.vendor,
-            'Browser Version': navigator.appVersion,
-            'Browser Platform Hint': getPlatformHint()
+            'Browser Version': getBrowserVersion(),
+            'navigator.appVersion (legacy)': navigator.appVersion,
+            'Platform (userAgentData)': getPlatformHint()
         });
     });
 
@@ -157,21 +158,63 @@ function testWebGLSupport() {
     return true;
 }
 
+// navigator.appVersion is a legacy UA fragment rather than a version number, so
+// it is reported under its own name and the real version is derived here.
+function getBrowserVersion() {
+    const brands = navigator.userAgentData && navigator.userAgentData.brands;
+    if (Array.isArray(brands)) {
+        // Chromium seeds the list with a deliberately nonsensical entry (GREASE)
+        // to stop consumers hard-coding one brand. It is not a real browser.
+        const real = brands.find((entry) => entry.brand && !/not.a.brand/i.test(entry.brand));
+        if (real) {
+            return `${real.brand} ${real.version}`;
+        }
+    }
+
+    // Order matters: Edge and Opera both carry a Chrome token, and Safari
+    // reports its own version under "Version/" next to a Safari build number.
+    const patterns = [
+        { name: 'Edge', pattern: /Edg\/([\d.]+)/ },
+        { name: 'Opera', pattern: /OPR\/([\d.]+)/ },
+        { name: 'Firefox', pattern: /Firefox\/([\d.]+)/ },
+        { name: 'Safari', pattern: /Version\/([\d.]+).*Safari/ },
+        { name: 'Chrome', pattern: /Chrome\/([\d.]+)/ }
+    ];
+
+    const userAgent = navigator.userAgent;
+    for (const { name, pattern } of patterns) {
+        const match = pattern.exec(userAgent);
+        if (match) {
+            return `${name} ${match[1]}`;
+        }
+    }
+    return 'Unknown';
+}
+
+// Deliberately UA-only. Preferring userAgentData.platform here made this row and
+// "Platform (userAgentData)" print the same string in Chromium, so two rows
+// reported one measurement.
 function getOS() {
     const userAgent = window.navigator.userAgent;
-    const userAgentDataPlatform = navigator.userAgentData && navigator.userAgentData.platform;
 
-    if (userAgentDataPlatform) {
-        return userAgentDataPlatform;
-    } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+    if (/iPhone|iPod/.test(userAgent)) {
         return 'iOS';
-    } else if (/Mac OS X|Macintosh/.test(userAgent)) {
+    }
+    // iPadOS 13+ ships a desktop UA string; touch points are what separate it
+    // from a real Mac.
+    if (/iPad/.test(userAgent) || (/Mac OS X|Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1)) {
+        return 'iPadOS';
+    }
+    if (/Mac OS X|Macintosh/.test(userAgent)) {
         return 'macOS';
-    } else if (/Windows/.test(userAgent)) {
+    }
+    if (/Windows/.test(userAgent)) {
         return 'Windows';
-    } else if (/Android/.test(userAgent)) {
+    }
+    if (/Android/.test(userAgent)) {
         return 'Android';
-    } else if (/Linux|X11/.test(userAgent)) {
+    }
+    if (/Linux|X11/.test(userAgent)) {
         return 'Linux';
     }
     return 'Unknown';

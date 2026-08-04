@@ -161,11 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 fragment.appendChild(row);
             });
 
-            fragment.appendChild(createDiffBlock('Header Fields', diffObjects(tokenA.header, tokenB.header)));
-            changeCount += countChanges(diffObjects(tokenA.header, tokenB.header));
+            const headerDiff = diffObjects(tokenA.header, tokenB.header);
+            fragment.appendChild(createDiffBlock('Header Fields', headerDiff));
+            changeCount += countChanges(headerDiff);
 
-            fragment.appendChild(createDiffBlock('Payload Fields', diffObjects(tokenA.payload, tokenB.payload)));
-            changeCount += countChanges(diffObjects(tokenA.payload, tokenB.payload));
+            const payloadDiff = diffObjects(tokenA.payload, tokenB.payload);
+            fragment.appendChild(createDiffBlock('Payload Fields', payloadDiff));
+            changeCount += countChanges(payloadDiff);
 
             const summaryMessage = changeCount === 0
                 ? 'No decoded differences found between the two JWTs.'
