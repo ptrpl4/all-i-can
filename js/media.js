@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { showResult } = window.BrowserTester;
+    const { showResult, showPending, updateResult, markError, runSection } = window.BrowserTester;
 
     // Test image formats
     const imageFormats = [
@@ -9,45 +9,57 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const imageTests = document.getElementById('imageTests');
-    
-    imageFormats.forEach(({format, src}) => {
-        const img = new Image();
-        img.onload = () => {
-            showResult(imageTests, `${format} Support`, true);
-        };
-        img.onerror = () => {
-            showResult(imageTests, `${format} Support`, false);
-        };
-        img.src = src;
+    runSection('Image Formats', imageTests, () => {
+        // Rows are created up front so they stay in declaration order — decoding
+        // is async and finishes in whatever order the browser gets to it.
+        imageFormats.forEach(({ format, src }) => {
+            const label = `${format} Support`;
+            const row = showPending(imageTests, label);
+            const img = new Image();
+
+            // The section guard only covers this setup; anything that goes wrong
+            // once decoding starts arrives here instead.
+            img.onload = () => updateResult(row, label, true);
+            img.onerror = () => updateResult(row, label, false);
+            try {
+                img.src = src;
+            } catch (error) {
+                markError(row, label, `Test errored: ${error.message}`);
+            }
+        });
     });
 
     // Test video codecs
     const videoTests = document.getElementById('videoTests');
-    const videoElement = document.createElement('video');
-    
-    const videoCodecs = [
-        { codec: 'H.264', type: 'video/mp4; codecs="avc1.42E01E"' },
-        { codec: 'VP8', type: 'video/webm; codecs="vp8"' },
-        { codec: 'VP9', type: 'video/webm; codecs="vp9"' }
-    ];
+    runSection('Video Codecs', videoTests, () => {
+        const videoElement = document.createElement('video');
 
-    videoCodecs.forEach(({codec, type}) => {
-        const support = videoElement.canPlayType(type);
-        showResult(videoTests, `${codec} Codec`, support !== '');
+        const videoCodecs = [
+            { codec: 'H.264', type: 'video/mp4; codecs="avc1.42E01E"' },
+            { codec: 'VP8', type: 'video/webm; codecs="vp8"' },
+            { codec: 'VP9', type: 'video/webm; codecs="vp9"' }
+        ];
+
+        videoCodecs.forEach(({ codec, type }) => {
+            const support = videoElement.canPlayType(type);
+            showResult(videoTests, `${codec} Codec`, support !== '');
+        });
     });
 
     // Test audio support
     const audioTests = document.getElementById('audioTests');
-    const audioElement = document.createElement('audio');
-    
-    const audioFormats = [
-        { format: 'MP3', type: 'audio/mpeg' },
-        { format: 'WAV', type: 'audio/wav' },
-        { format: 'OGG', type: 'audio/ogg' }
-    ];
+    runSection('Audio Formats', audioTests, () => {
+        const audioElement = document.createElement('audio');
 
-    audioFormats.forEach(({format, type}) => {
-        const support = audioElement.canPlayType(type);
-        showResult(audioTests, `${format} Format`, support !== '');
+        const audioFormats = [
+            { format: 'MP3', type: 'audio/mpeg' },
+            { format: 'WAV', type: 'audio/wav' },
+            { format: 'OGG', type: 'audio/ogg' }
+        ];
+
+        audioFormats.forEach(({ format, type }) => {
+            const support = audioElement.canPlayType(type);
+            showResult(audioTests, `${format} Format`, support !== '');
+        });
     });
 });

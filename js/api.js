@@ -1,93 +1,97 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { showResult, showInfo } = window.BrowserTester;
+    const { showResult, showInfo, runSection } = window.BrowserTester;
 
     // Test Storage APIs
     const storageTests = document.getElementById('storageTests');
-    
-    // LocalStorage
-    const hasLocalStorage = 'localStorage' in window;
-    showResult(storageTests, 'LocalStorage', hasLocalStorage);
+    runSection('Storage APIs', storageTests, () => {
+        // LocalStorage
+        const hasLocalStorage = 'localStorage' in window;
+        showResult(storageTests, 'LocalStorage', hasLocalStorage);
 
-    // SessionStorage
-    const hasSessionStorage = 'sessionStorage' in window;
-    showResult(storageTests, 'SessionStorage', hasSessionStorage);
+        // SessionStorage
+        const hasSessionStorage = 'sessionStorage' in window;
+        showResult(storageTests, 'SessionStorage', hasSessionStorage);
 
-    // IndexedDB
-    const hasIndexedDB = 'indexedDB' in window;
-    showResult(storageTests, 'IndexedDB', hasIndexedDB);
+        // IndexedDB
+        const hasIndexedDB = 'indexedDB' in window;
+        showResult(storageTests, 'IndexedDB', hasIndexedDB);
 
-    // Cache API
-    const hasCacheAPI = 'caches' in window;
-    showResult(storageTests, 'Cache API', hasCacheAPI);
+        // Cache API
+        const hasCacheAPI = 'caches' in window;
+        showResult(storageTests, 'Cache API', hasCacheAPI);
+    });
 
     // Test Device APIs
     const deviceTests = document.getElementById('deviceTests');
+    runSection('Device APIs', deviceTests, () => {
+        // Geolocation
+        const hasGeolocation = 'geolocation' in navigator;
+        showResult(deviceTests, 'Geolocation', hasGeolocation);
 
-    // Geolocation
-    const hasGeolocation = 'geolocation' in navigator;
-    showResult(deviceTests, 'Geolocation', hasGeolocation);
+        // Device Orientation
+        const hasDeviceOrientation = 'DeviceOrientationEvent' in window;
+        showResult(deviceTests, 'Device Orientation', hasDeviceOrientation);
 
-    // Device Orientation
-    const hasDeviceOrientation = 'DeviceOrientationEvent' in window;
-    showResult(deviceTests, 'Device Orientation', hasDeviceOrientation);
+        // Battery Status
+        const hasBattery = 'getBattery' in navigator;
+        showResult(deviceTests, 'Battery Status', hasBattery);
 
-    // Battery Status
-    const hasBattery = 'getBattery' in navigator;
-    showResult(deviceTests, 'Battery Status', hasBattery);
-
-    // Vibration
-    const hasVibration = 'vibrate' in navigator;
-    showResult(deviceTests, 'Vibration', hasVibration);
+        // Vibration
+        const hasVibration = 'vibrate' in navigator;
+        showResult(deviceTests, 'Vibration', hasVibration);
+    });
 
     // Test Communication APIs
     const communicationTests = document.getElementById('communicationTests');
+    runSection('Communication APIs', communicationTests, () => {
+        // WebSocket
+        const hasWebSocket = 'WebSocket' in window;
+        showResult(communicationTests, 'WebSocket', hasWebSocket);
 
-    // WebSocket
-    const hasWebSocket = 'WebSocket' in window;
-    showResult(communicationTests, 'WebSocket', hasWebSocket);
+        // WebRTC
+        const hasWebRTC = 'RTCPeerConnection' in window;
+        showResult(communicationTests, 'WebRTC', hasWebRTC);
 
-    // WebRTC
-    const hasWebRTC = 'RTCPeerConnection' in window;
-    showResult(communicationTests, 'WebRTC', hasWebRTC);
+        // Fetch API
+        const hasFetch = 'fetch' in window;
+        showResult(communicationTests, 'Fetch API', hasFetch);
 
-    // Fetch API
-    const hasFetch = 'fetch' in window;
-    showResult(communicationTests, 'Fetch API', hasFetch);
-
-    // Server-Sent Events
-    const hasSSE = 'EventSource' in window;
-    showResult(communicationTests, 'Server-Sent Events', hasSSE);
+        // Server-Sent Events
+        const hasSSE = 'EventSource' in window;
+        showResult(communicationTests, 'Server-Sent Events', hasSSE);
+    });
 
     // Test Performance APIs
     const performanceTests = document.getElementById('performanceTests');
+    runSection('Performance APIs', performanceTests, () => {
+        // Performance API
+        const hasPerformance = 'performance' in window;
+        showResult(performanceTests, 'Performance API', hasPerformance);
 
-    // Performance API
-    const hasPerformance = 'performance' in window;
-    showResult(performanceTests, 'Performance API', hasPerformance);
+        // RequestAnimationFrame
+        const hasRAF = 'requestAnimationFrame' in window;
+        showResult(performanceTests, 'RequestAnimationFrame', hasRAF);
 
-    // RequestAnimationFrame
-    const hasRAF = 'requestAnimationFrame' in window;
-    showResult(performanceTests, 'RequestAnimationFrame', hasRAF);
+        // Web Workers
+        const hasWebWorkers = 'Worker' in window;
+        showResult(performanceTests, 'Web Workers', hasWebWorkers);
 
-    // Web Workers
-    const hasWebWorkers = 'Worker' in window;
-    showResult(performanceTests, 'Web Workers', hasWebWorkers);
+        // SharedArrayBuffer (Parallel Processing)
+        const hasSharedArrayBuffer = 'SharedArrayBuffer' in window;
+        showResult(performanceTests, 'SharedArrayBuffer', hasSharedArrayBuffer);
+        if (hasSharedArrayBuffer && !window.crossOriginIsolated) {
+            showInfo(performanceTests, 'SharedArrayBuffer Context', 'Present, but full use usually requires a cross-origin isolated page.');
+        }
 
-    // SharedArrayBuffer (Parallel Processing)
-    const hasSharedArrayBuffer = 'SharedArrayBuffer' in window;
-    showResult(performanceTests, 'SharedArrayBuffer', hasSharedArrayBuffer);
-    if (hasSharedArrayBuffer && !window.crossOriginIsolated) {
-        showInfo(performanceTests, 'SharedArrayBuffer Context', 'Present, but full use usually requires a cross-origin isolated page.');
-    }
+        // Additional Modern APIs
+        if (hasPerformance) {
+            // Navigation Timing API
+            const hasNavigationTiming = 'PerformanceNavigationTiming' in window;
+            showResult(performanceTests, 'Navigation Timing', hasNavigationTiming);
 
-    // Additional Modern APIs
-    if (hasPerformance) {
-        // Navigation Timing API
-        const hasNavigationTiming = 'PerformanceNavigationTiming' in window;
-        showResult(performanceTests, 'Navigation Timing', hasNavigationTiming);
-
-        // Resource Timing API
-        const hasResourceTiming = 'PerformanceResourceTiming' in window;
-        showResult(performanceTests, 'Resource Timing', hasResourceTiming);
-    }
+            // Resource Timing API
+            const hasResourceTiming = 'PerformanceResourceTiming' in window;
+            showResult(performanceTests, 'Resource Timing', hasResourceTiming);
+        }
+    });
 });
