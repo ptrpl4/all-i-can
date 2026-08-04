@@ -401,15 +401,24 @@ function testEmojiSupport() {
         return true;
     }
 
-    // Otherwise compare against an unassigned code point. U+E0000 has no font
-    // coverage anywhere, so it takes the same fallback path an unsupported
-    // emoji would. A noncharacter such as U+FFFF does not: engines special-case
-    // noncharacters before font fallback, and may blank them while still
-    // drawing a box for the emoji, which reads as support that isn't there.
-    const fallback = paintGlyph(ctx, '\u{E0000}');
+    // Otherwise compare against a code point that takes the same fallback path
+    // an unsupported emoji would. U+0378 is permanently reserved in Greek and
+    // Coptic, so no font covers it, and it is ordinary enough that engines run
+    // it through normal fallback and draw the missing-glyph box.
+    //
+    // The two obvious alternatives both defeat the comparison by painting
+    // nothing, which always differs from a drawn glyph and so always reports
+    // support: noncharacters such as U+FFFF are special-cased before font
+    // fallback, and U+E0000 is Default_Ignorable_Code_Point, which shapers are
+    // required to hide.
+    const fallback = paintGlyph(ctx, '\u0378');
     return emoji.some((value, index) => value !== fallback[index]);
 }
 
+// Relies on paintGlyph never setting a colour fillStyle: the default black
+// keeps every fallback glyph grey (R=G=B, antialiasing included), so any
+// channel divergence can only come from a colour emoji font. Paint in a colour
+// and every missing-glyph box starts reading as emoji support.
 function hasColorPixels(data) {
     for (let i = 0; i < data.length; i += 4) {
         if (data[i + 3] !== 0 && (data[i] !== data[i + 1] || data[i + 1] !== data[i + 2])) {

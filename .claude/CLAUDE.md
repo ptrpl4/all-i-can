@@ -40,9 +40,10 @@ const { showResult } = window.BrowserTester;   // or showInfo / showPending
 The `data-status` value is surfaced visually by CSS (`.test-result::before { content: attr(data-status) }`), so pass/fail does not rely on color alone.
 
 ### Capability checks — accuracy rules
-A check that cannot fail is worse than no check. Two traps this codebase has already hit:
+A check that cannot fail is worse than no check. Three traps this codebase has already hit:
 - **Media queries**: test with `matchMedia(q).media !== 'not all'`. `MediaQueryList.toString()` returns `"[object MediaQueryList]"` and so never equals `'not all'`.
 - **CSS custom properties**: probe with `style.setProperty` / `style.getPropertyValue`. Custom properties are not CSSOM attributes, so `style['--x'] = v` sets a JS expando and always round-trips.
+- **Glyph comparison**: when a check paints a glyph and compares it against an unsupported code point, that code point must actually reach font fallback and draw a missing-glyph box. Pick a *reserved* code point — `graphics.js` uses U+0378, permanently reserved in Greek and Coptic. Noncharacters such as U+FFFF are special-cased before fallback, and U+E0000 is `Default_Ignorable_Code_Point`, which shapers are required to hide; both paint nothing, which differs from any real glyph and so always reports support. Write these as escapes (`'\u0378'`), never as literal characters in source.
 
 Label rows for what is actually measured. Where a capability is not observable from JS at all (GPU acceleration, HSTS, assistive-technology behavior), state that in a `showInfo` "Scope" row rather than reporting a proxy as the real thing.
 
@@ -102,17 +103,11 @@ Severity: **P0** = broken/visible to users, **P1** = incorrect behavior, **P2** 
 ### ARCH-03: `runSection` guards are per-section, not per-test
 - `runSection` stops one section from killing the next, but a throw still skips the remaining rows *within* its own section. Fine for now; revisit if individual checks start failing in ways that matter.
 
-### ARCH-04: Six feature scripts still have no `runSection` guard
-- `media.js`, `forms.js`, `security.js`, `api.js`, `activity.js`, and `jwt.js` still run their sections unguarded, so a throw in one truncates the rest of the page. Convert them the way `accessibility.js` and `data.js` are written: one `runSection(label, container, fn)` per `<section>`.
-
 ### NOTE-03: Accessibility tests don't test accessibility
 - `js/accessibility.js` mostly proves `setAttribute`/`getAttribute` works, which every browser passes. It doesn't exercise screen-reader behavior, focus management, or any real a11y API. The media-query checks are now real (`.media`), and the page carries a "Scope" row, but the reflection rows are still near-tautological.
 
 ### NOTE-05: Activity log ordering contradicts `role="log"`
 - Entries are inserted newest-first while `role="log"` implies newest-last. The mouse and keyboard logs are `aria-live="off"` so they no longer announce, but fixing the order properly needs scroll-to-bottom handling.
-
-### NOTE-06: Deferred P2 cleanups
-- Literal backticks in the `pages/jwt.html` lede; `navigator.appVersion` reported as "Browser Version"; `getOS()` and `getPlatformHint()` returning the same value in Chromium; hard-coded colors bypassing tokens (`.demo-canvas`, `.visual-demo`, `.diff-panel`, `.feature-card` hover); non-passive `mousemove`/`wheel` listeners plus a bfcache-blocking `beforeunload` in `activity.js`; unordered async image rows in `media.js`; `diffObjects` computed twice per section in `jwt.js`.
 
 ---
 
@@ -123,7 +118,9 @@ Severity: **P0** = broken/visible to users, **P1** = incorrect behavior, **P2** 
 - `.btn` / nav / fields now have `:focus-visible` styles.
 - Activity logs use `role="log"` + `aria-live="polite"`.
 - `gl-matrix` CDN dependency removed from `pages/graphics.html`.
-- ARCH-01 / ARCH-02 — `runSection` + `showError`/`markError` added, and a throw now renders an ERROR row instead of silently truncating the page. Wired up in `accessibility.js`, `data.js`, `graphics.js`, and `performance.js`; see ARCH-04 for the six scripts still unguarded.
+- ARCH-01 / ARCH-02 — `runSection` + `showError`/`markError` added, and a throw now renders an ERROR row instead of silently truncating the page.
+- ARCH-04 — every feature script that has test sections now guards them. `media.js`, `forms.js`, `security.js`, and `api.js` were converted; the original issue also named `activity.js` and `jwt.js`, which turned out not to need it. `activity.js` is event-listener registration, not test sections, so a guard around it catches nothing that later throws inside a callback; `jwt.js` already wraps every handler and parse helper in its own try/catch and reports through `renderStatus`.
+- NOTE-06 — P2 batch cleared: `<code>HS256</code>` in the JWT lede; a real "Browser Version" row from `userAgentData.brands` with `navigator.appVersion` relabeled legacy; `getOS()` made UA-only so it stops duplicating `getPlatformHint()` (and now separates iPadOS from macOS by touch points); `.demo-canvas`, `.visual-demo`, `.diff-panel`, and `.feature-card:hover` moved onto tokens with a new `--inset-highlight`; passive `mousemove`/`wheel` and the bfcache-blocking `beforeunload` dropped from `activity.js`; `media.js` image rows pre-created so they hold declaration order; `diffObjects` hoisted in `jwt.js`.
 - A11Y-05 — skip link on all 11 pages, `<main>` given `tabindex="-1"`.
 - NOTE-04 — obsolete. `navigator.platform` is gone; `getOS()` uses `userAgentData.platform` with UA fallbacks.
 - Pending rows resolve correctly — benchmarks in `js/performance.js` no longer display as `PENDING` forever (`updateResult`).
