@@ -9,6 +9,7 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <body class="tool-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav class="tool-nav">
         <a href="../index.html" class="nav-link nav-home-link">Home</a>
         <div class="nav-links">
@@ -25,7 +26,7 @@
         </div>
         <button id="themeSwitcher" class="theme-switcher" type="button">Theme: Auto</button>
     </nav>
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
         <header class="page-hero">
             <p class="eyebrow">Activity</p>
             <h1>User Activity</h1>
@@ -34,11 +35,11 @@
         <div class="test-container">
             <section class="test-section" id="mouse-activity">
                 <h2>Mouse Activity</h2>
-                <div id="mouseActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+                <div id="mouseActivity" class="activity-log" role="log" aria-live="off"></div>
             </section>
             <section class="test-section" id="keyboard-activity">
                 <h2>Keyboard Activity</h2>
-                <div id="keyboardActivity" class="activity-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+                <div id="keyboardActivity" class="activity-log" role="log" aria-live="off"></div>
             </section>
             <section class="test-section" id="browser-events">
                 <h2>Browser Events</h2>

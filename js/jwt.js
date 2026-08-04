@@ -161,21 +161,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 fragment.appendChild(row);
             });
 
-            fragment.appendChild(createDiffBlock('Header Fields', diffObjects(tokenA.header, tokenB.header)));
-            changeCount += countChanges(diffObjects(tokenA.header, tokenB.header));
+            const headerDiff = diffObjects(tokenA.header, tokenB.header);
+            fragment.appendChild(createDiffBlock('Header Fields', headerDiff));
+            changeCount += countChanges(headerDiff);
 
-            fragment.appendChild(createDiffBlock('Payload Fields', diffObjects(tokenA.payload, tokenB.payload)));
-            changeCount += countChanges(diffObjects(tokenA.payload, tokenB.payload));
+            const payloadDiff = diffObjects(tokenA.payload, tokenB.payload);
+            fragment.appendChild(createDiffBlock('Payload Fields', payloadDiff));
+            changeCount += countChanges(payloadDiff);
+
+            const summaryMessage = changeCount === 0
+                ? 'No decoded differences found between the two JWTs.'
+                : `${changeCount} difference${changeCount === 1 ? '' : 's'} found between the two JWTs.`;
 
             diffSummary.innerHTML = '';
-            showInfo(diffSummary, 'Comparison Summary', changeCount === 0
-                ? 'No decoded differences found between the two JWTs.'
-                : `${changeCount} difference${changeCount === 1 ? '' : 's'} found between the two JWTs.`);
+            showInfo(diffSummary, 'Comparison Summary', summaryMessage);
 
             diffOutput.appendChild(fragment);
+
+            // The clone is re-rendered inside the dialog, so it must not carry
+            // the id of the element it was copied from.
+            const outputNode = diffOutput.cloneNode(true);
+            outputNode.removeAttribute('id');
             lastCompareState = {
-                summaryText: diffSummary.textContent,
-                outputNode: diffOutput.cloneNode(true)
+                summaryText: summaryMessage,
+                outputNode
             };
             fullscreenButton.disabled = false;
             renderStatus(compareStatus, 'JWT comparison complete.');

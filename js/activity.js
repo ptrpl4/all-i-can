@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Mouse tracking
+    // Mouse tracking. These two fire during scroll and pointer movement and
+    // never call preventDefault, so they are registered passive to keep them
+    // off the critical path.
     document.addEventListener('mousemove', (e) => {
         const now = Date.now();
         if (now - lastMouseLogAt < 750) {
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         lastMouseLogAt = now;
         addLogEntry(mouseLog, `Mouse moved to (${e.clientX}, ${e.clientY})`);
-    });
+    }, { passive: true });
 
     document.addEventListener('click', (e) => {
         addLogEntry(mouseLog, `Clicked at (${e.clientX}, ${e.clientY})`);
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('wheel', (e) => {
         addLogEntry(mouseLog, `Scrolled ${e.deltaY > 0 ? 'down' : 'up'}`);
-    });
+    }, { passive: true });
 
     // Keyboard tracking
     document.addEventListener('keydown', (e) => {
@@ -67,7 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const devToolsIntervalId = window.setInterval(checkDevTools, 1000);
+    // Left running for the life of the page. Browsers pause timers on entry to
+    // the back/forward cache and tear them down on real unload, so there is
+    // nothing to clean up — and the `beforeunload` listener that used to do it
+    // made the page ineligible for bfcache.
+    window.setInterval(checkDevTools, 1000);
 
     // Page interactions
     document.addEventListener('copy', () => {
@@ -84,9 +90,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('visibilitychange', () => {
         addLogEntry(browserLog, `Page ${document.hidden ? 'hidden' : 'visible'}`);
-    });
-
-    window.addEventListener('beforeunload', () => {
-        window.clearInterval(devToolsIntervalId);
     });
 });

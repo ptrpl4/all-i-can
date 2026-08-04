@@ -1,96 +1,170 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const { showResult } = window.BrowserTester;
+    const { showResult, showInfo, runSection } = window.BrowserTester;
 
     // WebGL Tests
     const webglTests = document.getElementById('webglTests');
-    
-    // Test WebGL 1.0
-    const hasWebGL1 = testWebGL('webgl');
-    showResult(webglTests, 'WebGL 1.0', hasWebGL1);
 
-    // Test WebGL 2.0
-    const hasWebGL2 = testWebGL('webgl2');
-    showResult(webglTests, 'WebGL 2.0', hasWebGL2);
+    runSection('WebGL Capabilities', webglTests, () => {
+        const hasWebGL1 = testWebGL('webgl');
+        showResult(webglTests, 'WebGL 1.0', hasWebGL1);
+        showResult(webglTests, 'WebGL 2.0', testWebGL('webgl2'));
 
-    if (hasWebGL1) {
-        const gl = document.createElement('canvas').getContext('webgl');
-        showResult(webglTests, 'GPU Vendor', gl.getParameter(gl.VENDOR));
-        showResult(webglTests, 'GPU Renderer', gl.getParameter(gl.RENDERER));
-        showResult(webglTests, 'WebGL Version', gl.getParameter(gl.VERSION));
-        showResult(webglTests, 'Shader Version', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
-    }
+        if (hasWebGL1) {
+            withWebGLContext('webgl', gl => {
+                const { vendor, renderer } = readRendererStrings(gl);
+                showResult(webglTests, 'GPU Vendor', vendor);
+                showResult(webglTests, 'GPU Renderer', renderer);
+                showResult(webglTests, 'WebGL Version', gl.getParameter(gl.VERSION));
+                showResult(webglTests, 'Shader Version', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+            });
+        }
+    });
 
     // Canvas Features
     const canvasTests = document.getElementById('canvasTests');
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
 
-    showResult(canvasTests, '2D Canvas', !!ctx);
-    showResult(canvasTests, 'Path2D', 'Path2D' in window);
-    showResult(canvasTests, 'ImageData', 'ImageData' in window);
-    showResult(canvasTests, 'OffscreenCanvas', 'OffscreenCanvas' in window);
+    runSection('Canvas Features', canvasTests, () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        showResult(canvasTests, '2D Canvas', !!ctx);
+        showResult(canvasTests, 'Path2D', 'Path2D' in window);
+        showResult(canvasTests, 'ImageData', 'ImageData' in window);
+        showResult(canvasTests, 'OffscreenCanvas', 'OffscreenCanvas' in window);
+    });
 
     // CSS Features
     const cssTests = document.getElementById('cssTests');
-    const cssFeatures = {
-        'Grid': testCSSProperty('display', 'grid'),
-        'Flexbox': testCSSProperty('display', 'flex'),
-        'CSS Variables': testCSSProperty('--test', '0'),
-        'Transform 3D': testCSSProperty('transform', 'translate3d(0,0,0)'),
-        'Animations': testCSSProperty('animation', 'none'),
-        'Transitions': testCSSProperty('transition', 'none'),
-        'Media Queries': 'matchMedia' in window,
-        'CSS Masks': testCSSProperty('-webkit-mask', 'none') || testCSSProperty('mask', 'none')
-    };
 
-    Object.entries(cssFeatures).forEach(([feature, supported]) => {
-        showResult(cssTests, feature, supported);
+    runSection('CSS Features', cssTests, () => {
+        const cssFeatures = {
+            'Grid': testCSSProperty('display', 'grid'),
+            'Flexbox': testCSSProperty('display', 'flex'),
+            'CSS Variables': testCustomProperties(),
+            'Transform 3D': testCSSProperty('transform', 'translate3d(0,0,0)'),
+            'Animations': testCSSProperty('animation', 'none'),
+            'Transitions': testCSSProperty('transition', 'none'),
+            'Media Queries': 'matchMedia' in window,
+            'CSS Masks': testCSSProperty('-webkit-mask', 'none') || testCSSProperty('mask', 'none')
+        };
+
+        Object.entries(cssFeatures).forEach(([feature, supported]) => {
+            showResult(cssTests, feature, supported);
+        });
     });
 
     // SVG Support
     const svgTests = document.getElementById('svgTests');
-    const svgFeatures = {
-        'Basic SVG': 'createElementNS' in document,
-        'SVG in HTML': 'SVGElement' in window,
-        'SVG Animation (SMIL)': 'createElementNS' in document && testSVGAnimation(),
-        'SVG Filters': testSVGFilters()
-    };
 
-    Object.entries(svgFeatures).forEach(([feature, supported]) => {
-        showResult(svgTests, feature, supported);
+    runSection('SVG Support', svgTests, () => {
+        const svgFeatures = {
+            'Basic SVG': 'createElementNS' in document,
+            'SVG in HTML': 'SVGElement' in window,
+            'SVG Animation (SMIL)': 'createElementNS' in document && testSVGAnimation(),
+            'SVG Filters': testSVGFilters()
+        };
+
+        Object.entries(svgFeatures).forEach(([feature, supported]) => {
+            showResult(svgTests, feature, supported);
+        });
     });
 
-    // Add Hardware Acceleration Tests
+    // Graphics Hardware
     const hardwareTests = document.getElementById('hardwareTests');
-    const hardwareFeatures = testHardwareAcceleration();
-    Object.entries(hardwareFeatures).forEach(([feature, supported]) => {
-        showResult(hardwareTests, feature, supported);
+
+    runSection('Graphics Hardware', hardwareTests, () => {
+        showInfo(hardwareTests, 'Scope', 'Browsers do not expose whether compositing or canvas painting is GPU-backed. These rows report the GPU strings the driver is willing to share, plus support for CSS properties commonly used to request a compositing layer.');
+
+        const renderer = withWebGLContext('webgl', gl => readRendererStrings(gl));
+        showResult(hardwareTests, 'Reported GPU Renderer', (renderer && renderer.renderer) || 'Not available');
+        showResult(hardwareTests, 'Unmasked Renderer Exposed', Boolean(renderer && renderer.unmasked));
+        showResult(hardwareTests, 'WebGL 2.0 Available', testWebGL('webgl2'));
+        showResult(hardwareTests, 'Compositing Hint: translate3d', CSS.supports('transform', 'translate3d(0,0,0)'));
+        showResult(hardwareTests, 'Compositing Hint: will-change', CSS.supports('will-change', 'transform'));
     });
 
     // Add Font Tests
     const fontTests = document.getElementById('fontTests');
-    const fontFeatures = testFontCapabilities();
-    Object.entries(fontFeatures).forEach(([feature, supported]) => {
-        showResult(fontTests, feature, supported);
+
+    runSection('Font & Text Rendering', fontTests, () => {
+        const fontFeatures = testFontCapabilities();
+        Object.entries(fontFeatures).forEach(([feature, supported]) => {
+            showResult(fontTests, feature, supported);
+        });
     });
 
     // Create Visual Demos
-    createWebGLDemo();
-    createCanvasDemo();
-    createCSSDemo();
-    createSVGDemo();
-    createFontDemo();
+    runSection('WebGL Demo', document.getElementById('webglDemo'), createWebGLDemo);
+    runSection('Canvas Demo', document.getElementById('canvasDemo'), createCanvasDemo);
+    runSection('CSS Demo', document.getElementById('cssDemo'), createCSSDemo);
+    runSection('SVG Demo', document.getElementById('svgDemo'), createSVGDemo);
+    runSection('Font Demo', document.getElementById('fontDemo'), createFontDemo);
 });
 
+// Demos animate only when the user has not asked for reduced motion.
+function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function releaseContext(gl) {
+    const lose = gl.getExtension('WEBGL_lose_context');
+    if (lose) {
+        lose.loseContext();
+    }
+}
+
+// Contexts are a limited per-document resource, so probe contexts are always
+// released rather than left for the browser to evict.
+function withWebGLContext(contextType, fn) {
+    const gl = document.createElement('canvas').getContext(contextType);
+    if (!gl) {
+        return undefined;
+    }
+
+    try {
+        return fn(gl);
+    } finally {
+        releaseContext(gl);
+    }
+}
+
+const webglSupport = {};
 function testWebGL(contextType) {
-    const canvas = document.createElement('canvas');
-    return !!(canvas.getContext(contextType));
+    if (!(contextType in webglSupport)) {
+        webglSupport[contextType] = withWebGLContext(contextType, () => true) === true;
+    }
+    return webglSupport[contextType];
+}
+
+function readRendererStrings(gl) {
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+        return {
+            vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+            renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL),
+            unmasked: true
+        };
+    }
+
+    return {
+        vendor: gl.getParameter(gl.VENDOR),
+        renderer: gl.getParameter(gl.RENDERER),
+        unmasked: false
+    };
 }
 
 function testCSSProperty(property, value) {
     const el = document.createElement('div');
     el.style[property] = value;
     return el.style[property] === value;
+}
+
+// Custom properties are not CSSOM attributes, so they only round-trip through
+// setProperty/getPropertyValue.
+function testCustomProperties() {
+    const el = document.createElement('div');
+    el.style.setProperty('--browser-tester-probe', 'ok');
+    return el.style.getPropertyValue('--browser-tester-probe').trim() === 'ok';
 }
 
 function testSVGAnimation() {
@@ -104,16 +178,24 @@ function testSVGFilters() {
     return 'filter' in svg && filter instanceof SVGElement;
 }
 
+function showDemoMessage(container, message) {
+    window.BrowserTester.showInfo(container, 'Demo', message);
+}
+
 function createWebGLDemo() {
     const container = document.getElementById('webglDemo');
     const canvas = document.createElement('canvas');
     canvas.className = 'demo-canvas';
     canvas.width = 300;
     canvas.height = 300;
-    container.appendChild(canvas);
 
     const gl = canvas.getContext('webgl');
-    if (!gl) return;
+    if (!gl) {
+        showDemoMessage(container, 'WebGL is not available in this browser, so the rotating cube cannot render.');
+        return;
+    }
+
+    container.appendChild(canvas);
 
     // Create a rotating cube
     const vsSource = `
@@ -135,9 +217,14 @@ function createWebGLDemo() {
         }
     `;
 
-    // Initialize shaders and start animation
-    initShaderProgram(gl, vsSource, fsSource);
-    // ... (WebGL initialization code)
+    const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+    if (!shaderProgram) {
+        canvas.remove();
+        showDemoMessage(container, 'The demo shader program failed to compile or link. See the console for the driver log.');
+        return;
+    }
+
+    startCubeDemo(gl, shaderProgram);
 }
 
 function createCanvasDemo() {
@@ -146,14 +233,19 @@ function createCanvasDemo() {
     canvas.className = 'demo-canvas';
     canvas.width = 300;
     canvas.height = 300;
-    container.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+        showDemoMessage(container, '2D canvas is not available in this browser.');
+        return;
+    }
+
+    container.appendChild(canvas);
+
     let frame = 0;
     let rafId = null;
 
-    function animate() {
+    function drawFrame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         for (let i = 0; i < 12; i++) {
@@ -166,7 +258,15 @@ function createCanvasDemo() {
             ctx.fillStyle = `hsl(${frame + i * 30}, 70%, 50%)`;
             ctx.fill();
         }
+    }
 
+    if (prefersReducedMotion()) {
+        drawFrame();
+        return;
+    }
+
+    function animate() {
+        drawFrame();
         frame++;
         rafId = requestAnimationFrame(animate);
     }
@@ -181,8 +281,6 @@ function createCanvasDemo() {
             }
         });
         observer.observe(canvas);
-        rafId = requestAnimationFrame(animate);
-        return;
     }
 
     rafId = requestAnimationFrame(animate);
@@ -191,22 +289,29 @@ function createCanvasDemo() {
 function createCSSDemo() {
     const container = document.getElementById('cssDemo');
     const demo = document.createElement('div');
+    const animated = !prefersReducedMotion();
+
     demo.innerHTML = `
         <div class="css-demo-item" style="
             width: 100px;
             height: 100px;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             border-radius: 10px;
-            animation: rotate 3s infinite linear;
+            ${animated ? 'animation: browser-tester-rotate 3s infinite linear;' : ''}
             transform-style: preserve-3d;
         "></div>
     `;
     container.appendChild(demo);
 
-    // Add animation keyframes
+    if (!animated || document.getElementById('browser-tester-demo-keyframes')) {
+        return;
+    }
+
+    // Namespaced so the demo cannot collide with a page-level animation name
     const style = document.createElement('style');
+    style.id = 'browser-tester-demo-keyframes';
     style.textContent = `
-        @keyframes rotate {
+        @keyframes browser-tester-rotate {
             from { transform: rotate3d(1, 1, 1, 0deg); }
             to { transform: rotate3d(1, 1, 1, 360deg); }
         }
@@ -221,7 +326,10 @@ function createSVGDemo() {
     svg.setAttribute('height', '300');
     svg.setAttribute('viewBox', '0 0 100 100');
 
-    // Create animated SVG content
+    const pulse = prefersReducedMotion()
+        ? ''
+        : '<animate attributeName="r" values="20;25;20" dur="2s" repeatCount="indefinite"/>';
+
     svg.innerHTML = `
         <defs>
             <filter id="glow">
@@ -233,7 +341,7 @@ function createSVGDemo() {
             </filter>
         </defs>
         <circle cx="50" cy="50" r="20" fill="#4ecdc4" filter="url(#glow)">
-            <animate attributeName="r" values="20;25;20" dur="2s" repeatCount="indefinite"/>
+            ${pulse}
         </circle>
     `;
 
@@ -252,28 +360,6 @@ function createFontDemo() {
     `;
 }
 
-// Add helper functions for WebGL initialization... 
-
-function testHardwareAcceleration() {
-    return {
-        'Hardware Acceleration': testWebGL('webgl'),
-        'GPU Compositing': CSS.supports('transform', 'translate3d(0,0,0)'),
-        'WebGL2 Support': testWebGL('webgl2'),
-        'Canvas Hardware Acceleration': testCanvasHardwareAcceleration()
-    };
-}
-
-function testCanvasHardwareAcceleration() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) return false;
-    try {
-        return ctx.getContextAttributes().alpha === false;
-    } catch {
-        return true; // context exists but attributes API unsupported
-    }
-}
-
 function testFontCapabilities() {
     return {
         'Font Loading API': 'FontFace' in window,
@@ -285,17 +371,71 @@ function testFontCapabilities() {
     };
 }
 
+function paintGlyph(ctx, char) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillText(char, 0, 0);
+    return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+}
+
 function testEmojiSupport() {
     const canvas = document.createElement('canvas');
+    canvas.width = 24;
+    canvas.height = 24;
     const ctx = canvas.getContext('2d');
-    ctx.fillText('😀', 0, 0);
-    return ctx.getImageData(0, 0, 1, 1).data[3] !== 0;
+    if (!ctx) {
+        return false;
+    }
+
+    ctx.font = '18px sans-serif';
+    ctx.textBaseline = 'top';
+
+    const emoji = paintGlyph(ctx, '\u{1F600}');
+    const painted = emoji.some((value, index) => index % 4 === 3 && value !== 0);
+    if (!painted) {
+        return false;
+    }
+
+    // A colour emoji font paints non-grey pixels. Nothing in the fallback path
+    // does, so this alone settles the question.
+    if (hasColorPixels(emoji)) {
+        return true;
+    }
+
+    // Otherwise compare against a code point that takes the same fallback path
+    // an unsupported emoji would. U+0378 is permanently reserved in Greek and
+    // Coptic, so no font covers it, and it is ordinary enough that engines run
+    // it through normal fallback and draw the missing-glyph box.
+    //
+    // The two obvious alternatives both defeat the comparison by painting
+    // nothing, which always differs from a drawn glyph and so always reports
+    // support: noncharacters such as U+FFFF are special-cased before font
+    // fallback, and U+E0000 is Default_Ignorable_Code_Point, which shapers are
+    // required to hide.
+    const fallback = paintGlyph(ctx, '\u0378');
+    return emoji.some((value, index) => value !== fallback[index]);
+}
+
+// Relies on paintGlyph never setting a colour fillStyle: the default black
+// keeps every fallback glyph grey (R=G=B, antialiasing included), so any
+// channel divergence can only come from a colour emoji font. Paint in a colour
+// and every missing-glyph box starts reading as emoji support.
+function hasColorPixels(data) {
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] !== 0 && (data[i] !== data[i + 1] || data[i + 1] !== data[i + 2])) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Complete WebGL demo implementation
 function initShaderProgram(gl, vsSource, fsSource) {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+    if (!vertexShader || !fragmentShader) {
+        return null;
+    }
 
     const shaderProgram = gl.createProgram();
     gl.attachShader(shaderProgram, vertexShader);
@@ -304,9 +444,14 @@ function initShaderProgram(gl, vsSource, fsSource) {
 
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
         console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+        gl.deleteProgram(shaderProgram);
         return null;
     }
 
+    return shaderProgram;
+}
+
+function startCubeDemo(gl, shaderProgram) {
     const programInfo = {
         program: shaderProgram,
         attribLocations: {
@@ -368,7 +513,7 @@ function initShaderProgram(gl, vsSource, fsSource) {
     let rotation = 0;
     let rafId = null;
 
-    function render() {
+    function drawScene() {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -397,7 +542,16 @@ function initShaderProgram(gl, vsSource, fsSource) {
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+    }
 
+    if (prefersReducedMotion()) {
+        rotation = 0.6;
+        drawScene();
+        return;
+    }
+
+    function render() {
+        drawScene();
         rotation += 0.02;
         rafId = requestAnimationFrame(render);
     }
@@ -412,8 +566,6 @@ function initShaderProgram(gl, vsSource, fsSource) {
             }
         });
         observer.observe(gl.canvas);
-        rafId = requestAnimationFrame(render);
-        return;
     }
 
     rafId = requestAnimationFrame(render);

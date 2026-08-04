@@ -1,5 +1,7 @@
-html {
-    scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
 }
 
 :root {
@@ -58,6 +60,7 @@ html {
     --result-info-text: #343a40;
     --result-pending-bg: #fff3cd;
     --result-pending-text: #856404;
+    --inset-highlight: rgba(255, 255, 255, 0.75);
     --focus-ring: #ffd24d;
 }
 
@@ -111,6 +114,7 @@ html {
     --result-info-text: #d7e3e8;
     --result-pending-bg: rgba(101, 82, 34, 0.92);
     --result-pending-text: #ffefbf;
+    --inset-highlight: rgba(255, 255, 255, 0.06);
     --focus-ring: #a8d8eb;
 }
 
@@ -136,6 +140,30 @@ body {
 
 body.dialog-open {
     overflow: hidden;
+}
+
+/* Fixed rather than absolute so it stays reachable when the page is scrolled. */
+.skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    padding: 0.7rem 1.1rem;
+    background: var(--nav-current-bg);
+    color: var(--nav-current-text);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 0 0 var(--radius-sm) 0;
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.skip-link:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
 }
 
 nav {
@@ -365,8 +393,8 @@ main {
 
 .feature-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(41, 95, 118, 0.22);
-    box-shadow: 0 24px 48px rgba(57, 40, 23, 0.14);
+    border-color: var(--surface-border-strong);
+    box-shadow: var(--shadow-soft);
 }
 
 .feature-card p {
@@ -670,7 +698,7 @@ h2 {
     border-radius: 14px;
     background: var(--field-bg);
     color: var(--text-strong);
-    border: 1px solid rgba(72, 49, 33, 0.08);
+    border: 1px solid var(--surface-border);
     white-space: pre-wrap;
     word-break: break-word;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -778,9 +806,9 @@ h2 {
     margin: 1rem 0;
     padding: 1rem;
     background: var(--ghost-bg);
-    border: 1px solid rgba(72, 49, 33, 0.08);
+    border: 1px solid var(--surface-border);
     border-radius: var(--radius-md);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    box-shadow: inset 0 1px 0 var(--inset-highlight);
     min-height: 200px;
     display: flex;
     justify-content: center;
@@ -788,7 +816,7 @@ h2 {
 }
 
 .demo-canvas {
-    border: 1px solid #ddd;
+    border: 1px solid var(--surface-border);
     max-width: 100%;
 }
 

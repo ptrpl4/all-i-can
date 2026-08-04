@@ -15,6 +15,7 @@ Built with plain HTML, CSS, and JavaScript.
 - **Performance**: Run lightweight JavaScript and DOM benchmarks
 - **Accessibility-Related APIs**: Check DOM and CSS APIs related to accessibility
 - **Activity Tracking**: Monitor user interactions and browser events on the current page
+- **JWT Tools**: Encode, decode, and compare JWTs, with HS256 signing in the browser
 
 ## Technologies
 
@@ -57,3 +58,6 @@ Works in modern browsers that support:
 - Results reflect the current browser and page context. Some checks are affected by HTTPS, permissions, browser policy, or cross-origin isolation.
 - The accessibility page does not test real assistive technology behavior. It reports browser-exposed DOM and CSS features related to accessibility.
 - HSTS and other server-side policies cannot be fully verified from client-side JavaScript alone.
+- Location is read only when requested from the Data page, so opening a page never triggers a permission prompt on its own.
+- Whether compositing or canvas painting is GPU-backed is not exposed to JavaScript. The Graphics Hardware section reports GPU strings and compositing-related CSS support, not acceleration itself.
+- Visual demos on the Graphics page render a single static frame when the browser reports `prefers-reduced-motion: reduce`.

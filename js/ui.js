@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth'
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
             });
         });
     });
@@ -79,7 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const resolvedTheme = mode === 'dark' ? 'dark' : 'light';
+        // Fallback path for when theme.js failed to load or threw: resolve
+        // "auto" against the OS preference rather than defaulting to light.
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const resolvedTheme = mode === 'light'
+            ? 'light'
+            : (mode === 'dark' || prefersDark ? 'dark' : 'light');
         document.documentElement.dataset.theme = resolvedTheme;
         document.documentElement.dataset.themeMode = mode;
     }
